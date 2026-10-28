@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiTurnoPY - Estética en Paraguay</title>
+    <style>
+        :root { 
+            --primary-color: #b8004f; 
+            --primary-hover: #96003f; 
+            --bg-color: #ffffff; 
+            --text-color: #1a1a1a; 
+            --text-muted: #555555; 
+            --nav-bg: #b8004f; 
+            --nav-text: #ffffff; 
+            --card-bg: #f8f9fa; 
+            --card-border: #eaeaea; 
+            --footer-bg: #b8004f; 
+            --footer-text: #ffffff;
+            --footer-muted: rgba(255, 255, 255, 0.85);
+            --filter-bg: #f1f3f5; 
+        }
+
+        [data-theme="dark"] { 
+            --bg-color: #12030a; 
+            --text-color: #ffffff; 
+            --text-muted: #b0b0b0; 
+            --nav-bg: #1f0510; 
+            --nav-text: #ffffff; 
+            --card-bg: #1f0510; 
+            --card-border: #380d22; 
+            --footer-bg: #1f0510; 
+            --footer-text: #ffffff;
+            --footer-muted: #b0b0b0;
+            --filter-bg: #1f0510; 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding-top: 85px; 
+            animation: fadeInPage 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            background-color: var(--nav-bg); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 40px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            z-index: 1000; 
+        }
+
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-container img { height: 50px; width: 50px; object-fit: contain; border-radius: 10px; }
+        .logo-text { color: var(--nav-text); font-size: 1.6rem; font-weight: bold; }
+        
+        nav ul { display: flex; list-style: none; gap: 25px; align-items: center; }
+        nav ul li { position: relative; }
+        nav ul li a { color: var(--nav-text); text-decoration: none; font-weight: 500; font-size: 1rem; padding: 10px 0; display: block; transition: opacity 0.2s ease; }
+        nav ul li a:hover { opacity: 0.8; }
+        
+        .dropdown-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(8px); background: var(--nav-bg); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); width: 220px; padding: 8px 0; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: all 0.25s ease-in-out; z-index: 1100; }
+        nav ul li.dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .dropdown-menu a { padding: 11px 20px; font-size: 0.9rem; font-weight: 500; color: var(--nav-text); text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.08); transition: background 0.2s ease, padding-left 0.2s ease; }
+        .dropdown-menu a:last-child { border-bottom: none; }
+        .dropdown-menu a:hover { background-color: rgba(255, 255, 255, 0.12); padding-left: 24px; opacity: 1; }
+        
+        .nav-buttons { display: flex; gap: 15px; align-items: center; }
+        
+        .btn-login { 
+            background: transparent; 
+            border: 2px solid rgba(255, 255, 255, 0.8); 
+            color: #ffffff; 
+            padding: 8px 20px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            text-decoration: none; 
+            display: inline-block; 
+            text-align: center; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-login:hover { 
+            background: rgba(255, 255, 255, 0.15); 
+            border-color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-create { 
+            background: #ffffff; 
+            border: none; 
+            color: var(--primary-color); 
+            padding: 10px 22px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            text-decoration: none; 
+            display: inline-block; 
+            text-align: center; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .btn-create:hover { 
+            background: #fff0f5; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .theme-toggle { 
+            background: transparent; 
+            border: 2px solid rgba(255, 255, 255, 0.8); 
+            color: #ffffff; 
+            padding: 7px 14px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+        
+        .category-container { max-width: 1200px; margin: 40px auto 80px auto; padding: 0 40px; width: 100%; }
+        .category-header { text-align: center; margin-bottom: 40px; }
+        .category-header h1 { font-size: 3rem; font-weight: 800; margin-bottom: 15px; }
+        .category-header h1 span { color: var(--primary-color); }
+        .category-header p { font-size: 1.1rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+        
+        .filter-bar { background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 22px; padding: 30px; display: flex; flex-direction: column; gap: 24px; margin-bottom: 40px; box-shadow: 0 12px 30px rgba(184, 0, 79, 0.04); }
+        .filter-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        
+        .filter-title { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .filter-title svg { width: 20px; height: 20px; fill: var(--primary-color); }
+        
+        .custom-select-container { position: relative; width: 100%; max-width: 380px; }
+        
+        .custom-select-trigger { background: var(--bg-color); border: 2px solid var(--card-border); color: var(--text-color); padding: 13px 20px; border-radius: 14px; font-size: 0.98rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: all 0.25s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .custom-select-trigger:hover { border-color: var(--primary-color); }
+        .custom-select-container.open .custom-select-trigger { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(184, 0, 79, 0.15); }
+        .custom-select-trigger::after { content: '▾'; font-size: 1.1rem; color: var(--primary-color); transition: transform 0.3s ease; }
+        .custom-select-container.open .custom-select-trigger::after { transform: rotate(180deg); }
+
+        .custom-options { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; background: var(--bg-color); border: 2px solid var(--primary-color); border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); max-height: 250px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1200; }
+        .custom-select-container.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        .custom-options::-webkit-scrollbar { width: 6px; }
+        .custom-options::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
+
+        .custom-option { padding: 12px 18px; font-size: 0.95rem; font-weight: 500; color: var(--text-color); cursor: pointer; border-bottom: 1px solid var(--card-border); transition: background 0.2s ease, padding-left 0.2s ease, color 0.2s ease; }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: rgba(184, 0, 79, 0.08); color: var(--primary-color); padding-left: 22px; font-weight: 600; }
+        .custom-option.selected { background-color: var(--primary-color); color: #ffffff; font-weight: 700; }
+        
+        .custom-select-container.disabled { opacity: 0.5; pointer-events: none; }
+
+        .distance-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+        .distance-chip { background: var(--filter-bg); border: 2px solid var(--card-border); color: var(--text-color); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .distance-chip.active, .distance-chip:hover { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+        
+        /* Tarjetas con banner fino y logo circular */
+        .salons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        
+        .salon-card { 
+            background: var(--card-bg); 
+            border: 2px solid var(--card-border); 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03); 
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+            cursor: pointer; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+        }
+        .salon-card:hover { 
+            transform: translateY(-8px); 
+            border-color: var(--primary-color); 
+            box-shadow: 0 15px 30px rgba(184, 0, 79, 0.15); 
+        }
+
+        .salon-banner {
+            width: 100%;
+            height: 90px;
+            background: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+            position: relative;
+        }
+        .salon-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .salon-logo-wrapper {
+            position: relative;
+            padding: 0 25px;
+            margin-top: -32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 12px;
+        }
+        .salon-logo {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 3px solid var(--card-border);
+            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .salon-body {
+            padding: 0 25px 25px 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+
+        .salon-info h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+        .salon-location { font-size: 0.9rem; color: var(--primary-color); font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .salon-desc { font-size: 0.92rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px; }
+        .salon-rating { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 20px; display: flex; align-items: center; gap: 5px; }
+        .salon-rating span { color: #f39c12; }
+        
+        .btn-reserve { background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); width: 100%; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+        .salon-card:hover .btn-reserve { background: var(--primary-color); color: #ffffff; }
+
+        footer { background-color: var(--footer-bg); color: var(--footer-text); border-top: 1px solid rgba(255, 255, 255, 0.15); padding: 20px 40px 12px 40px; width: 100%; }
+        .footer-content { max-width: 1300px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        .footer-brand { max-width: 400px; }
+        .footer-logo { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .footer-logo img { height: 28px; width: 28px; object-fit: contain; border-radius: 6px; }
+        .footer-logo span { font-size: 1.15rem; font-weight: bold; color: #ffffff; }
+        .footer-brand p { font-size: 0.85rem; color: var(--footer-muted); line-height: 1.3; }
+        .footer-links-group { display: flex; gap: 40px; }
+        .footer-col h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; color: #ffffff; }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+        .footer-col ul li a { color: var(--footer-muted); text-decoration: none; font-size: 0.85rem; }
+        .footer-col ul li a:hover { color: #ffffff; text-decoration: underline; }
+        .footer-bottom { max-width: 1300px; margin: 10px auto 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: 0.8rem; color: var(--footer-muted); }
+        .footer-legal-links { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .footer-legal-links a { color: var(--footer-muted); text-decoration: none; }
+        .footer-legal-links a:hover { color: #ffffff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-container"><img src="logo.png" alt="Logo" onerror="this.style.display='none'"><span class="logo-text">MiTurnoPY</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown"><a href="peluquerias.html">Categorías ▾</a>
+                    <div class="dropdown-menu">
+                        <a href="peluquerias.html">Peluquerías</a><a href="barberias.html">Barberías</a><a href="maquillaje.html">Maquillaje</a><a href="unas.html">Uñas</a><a href="tatuajes.html">Tatuajes</a><a href="salon.html">Salón de Belleza</a><a href="estetica.html">Estética</a>
+                    </div>
+                </li>
+                <li><a href="planes.html">Planes</a></li><li><a href="contacto.html">Contacto</a></li><li><a href="conoce-mas.html">Conocé más</a></li>
+            </ul>
+        </nav>
+        <div class="nav-buttons">
+            <button class="theme-toggle" id="themeToggleBtn" onclick="cycleTheme()" title="Cambiar modo">
+                <span id="themeIconContainer">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </span> 
+                <span id="themeText">Claro</span>
+            </button>
+            <a href="login.html" class="btn-login">Iniciá sesión</a>
+            <a href="register.html" class="btn-create">Crear YA</a>
+        </div>
+    </header>
+
+    <main class="category-container">
+        <div class="category-header">
+            <h1>Centros de <span>Estética y Spa</span></h1>
+            <p>Seleccioná primero el departamento y luego tu ciudad para encontrar los mejores especialistas.</p>
+        </div>
+        
+        <div class="filter-bar">
+            <!-- Desplegable Custom de Departamento -->
+            <div class="filter-row">
+                <span class="filter-title">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    Elegir Departamento:
+                </span>
+                <div class="custom-select-container" id="deptoSelectContainer">
+                    <div class="custom-select-trigger" id="deptoTrigger">Seleccioná un Departamento</div>
+                    <div class="custom-options" id="deptoOptions">
+                        <div class="custom-option" data-value="asuncion">Asunción (Distrito Capital)</div>
+                        <div class="custom-option" data-value="central">Departamento Central</div>
+                        <div class="custom-option" data-value="itapua">Departamento de Itapúa</div>
+                        <div class="custom-option" data-value="alto-parana">Departamento de Alto Paraná</div>
+                        <div class="custom-option" data-value="guaira">Departamento de Guairá</div>
+                        <div class="custom-option" data-value="caaguazu">Departamento de Caazapú</div>
+                        <div class="custom-option" data-value="cordillera">Departamento de Cordillera</div>
+                        <div class="custom-option" data-value="amambay">Departamento de Amambay</div>
+                        <div class="custom-option" data-value="canindeyu">Departamento de Canindeyú</div>
+                        <div class="custom-option" data-value="misiones">Departamento de Misiones</div>
+                        <div class="custom-option" data-value="paraguari">Departamento de Paraguarí</div>
+                        <div class="custom-option" data-value="concepcion">Departamento de Concepción</div>
+                        <div class="custom-option" data-value="san-pedro">Departamento de San Pedro</div>
+                        <div class="custom-option" data-value="neembucu">Departamento de Ñeembucú</div>
+                        <div class="custom-option" data-value="presidente-hayes">Departamento de Presidente Hayes</div>
+                        <div class="custom-option" data-value="boqueron">Departamento de Boquerón</div>
+                        <div class="custom-option" data-value="alto-paraguay">Departamento de Alto Paraguay</div>
+                        <div class="custom-option" data-value="caazapa">Departamento de Caazapá</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desplegable Custom de Ciudad -->
+            <div class="filter-row">
+                <span class="filter-title">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    Elegir Ciudad:
+                </span>
+                <div class="custom-select-container disabled" id="citySelectContainer">
+                    <div class="custom-select-trigger" id="cityTrigger">Primero elegí un departamento</div>
+                    <div class="custom-options" id="cityOptions">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-row" style="border-top: 1px solid var(--card-border); padding-top: 18px;">
+                <div class="distance-chips">
+                    <button class="distance-chip active" onclick="activarCercaMio(this)">📍 Cerca de mí</button>
+                    <button class="distance-chip" onclick="filtrarDistancia(1, this)">1 km</button>
+                    <button class="distance-chip" onclick="filtrarDistancia(5, this)">5 km</button>
+                    <button class="distance-chip" onclick="filtrarDistancia(20, this)">20 km</button>
+                </div>
+                <span id="estadoFiltro" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">Seleccioná un radio de distancia</span>
+            </div>
+        </div>
+
+        <div class="salons-grid">
+            <div class="salon-card">
+                <div class="salon-banner">
+                    <img src="banner-estetica1.jpg" alt="Banner" onerror="this.style.display='none'">
+                </div>
+                <div class="salon-logo-wrapper">
+                    <img src="logo-estetica1.jpg" alt="Logo" class="salon-logo" onerror="this.src='logo.png'">
+                </div>
+                <div class="salon-body">
+                    <div class="salon-info">
+                        <h3>Derma Estética Avanzada</h3>
+                        <div class="salon-location">📍 Asunción</div>
+                        <p class="salon-desc">Cuidado profesional de la piel, limpieza profunda y aparatología.</p>
+                        <div class="salon-rating"><span>★ 5.0</span> (175 reseñas)</div>
+                    </div>
+                    <button class="btn-reserve">Reservar Turno</button>
+                </div>
+            </div>
+
+            <div class="salon-card">
+                <div class="salon-banner" style="background: linear-gradient(135deg, #1f0510 0%, #b8004f 100%);">
+                    <img src="banner-estetica2.jpg" alt="Banner" onerror="this.style.display='none'">
+                </div>
+                <div class="salon-logo-wrapper">
+                    <img src="logo-estetica2.jpg" alt="Logo" class="salon-logo" onerror="this.src='logo.png'">
+                </div>
+                <div class="salon-body">
+                    <div class="salon-info">
+                        <h3>Spa & Estética CDE</h3>
+                        <div class="salon-location">📍 Ciudad del Este</div>
+                        <p class="salon-desc">Masajes relajantes, drenaje linfático y tratamientos reductores.</p>
+                        <div class="salon-rating"><span>★ 4.9</span> (130 reseñas)</div>
+                    </div>
+                    <button class="btn-reserve">Reservar Turno</button>
+                </div>
+            </div>
+
+            <div class="salon-card">
+                <div class="salon-banner" style="background: linear-gradient(135deg, #ff4b91 0%, #96003f 100%);">
+                    <img src="banner-estetica3.jpg" alt="Banner" onerror="this.style.display='none'">
+                </div>
+                <div class="salon-logo-wrapper">
+                    <img src="logo-estetica3.jpg" alt="Logo" class="salon-logo" onerror="this.src='logo.png'">
+                </div>
+                <div class="salon-body">
+                    <div class="salon-info">
+                        <h3>Vital Estética Integral</h3>
+                        <div class="salon-location">📍 Encarnación</div>
+                        <p class="salon-desc">Depilación láser, estética facial y corporal con tecnología de punta.</p>
+                        <div class="salon-rating"><span>★ 4.8</span> (92 reseñas)</div>
+                    </div>
+                    <button class="btn-reserve">Reservar Turno</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+                    <span>MiTurnoPY</span>
+                </div>
+                <p>Reservas, clientes y gestión de agenda en un solo lugar. Diseñado exclusivamente para potenciar los negocios de belleza y estética en Paraguay.</p>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-col">
+                    <h4>Navegación</h4>
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="planes.html">Planes</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                        <li><a href="conoce-mas.html">Conocé más</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Soporte</h4>
+                    <ul>
+                        <li><a href="contacto.html">Ayuda y FAQ</a></li>
+                        <li><a href="mailto:soportemiturnopy@gmail.com">soportemiturnopy@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MiTurnoPY. Todos los derechos reservados • Encarnación, Paraguay • Contacto comercial: soportemiturnopy@gmail.com</p>
+            <div class="footer-legal-links">
+                <a href="terminos.html">Términos y Condiciones</a>
+                <span>•</span>
+                <a href="privacidad.html">Política de Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const links = document.querySelectorAll("a");
+
+            links.forEach(link => {
+                link.addEventListener("click", function(e) {
+                    const targetHref = this.getAttribute("href");
+
+                    if (
+                        targetHref &&
+                        !targetHref.startsWith("http") &&
+                        !targetHref.startsWith("#") &&
+                        !targetHref.startsWith("mailto") &&
+                        this.getAttribute("target") !== "_blank"
+                    ) {
+                        e.preventDefault();
+                        document.body.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+                        document.body.style.opacity = "0";
+                        document.body.style.transform = "translateY(-6px)";
+
+                        setTimeout(() => {
+                            window.location.href = targetHref;
+                        }, 250);
+                    }
+                });
+            });
+        });
+
+        const body = document.body; 
+        const iconContainer = document.getElementById('themeIconContainer'); 
+        const textSpan = document.getElementById('themeText'); 
+        let currentMode = localStorage.getItem('miturnopy_theme') || 'light';
+
+        const svgs = {
+            light: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+            dark: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            system: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+        };
+
+        function applyTheme(mode) { 
+            currentMode = mode; 
+            localStorage.setItem('miturnopy_theme', mode); 
+            if (mode === 'system') { 
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; 
+                body.setAttribute('data-theme', prefersDark ? 'dark' : 'light'); 
+                if(iconContainer) iconContainer.innerHTML = svgs.system; 
+                if(textSpan) textSpan.textContent = 'Sistema'; 
+            } else if (mode === 'dark') { 
+                body.setAttribute('data-theme', 'dark'); 
+                if(iconContainer) iconContainer.innerHTML = svgs.dark; 
+                if(textSpan) textSpan.textContent = 'Oscuro'; 
+            } else { 
+                body.setAttribute('data-theme', 'light'); 
+                if(iconContainer) iconContainer.innerHTML = svgs.light; 
+                if(textSpan) textSpan.textContent = 'Claro'; 
+            } 
+        }
+
+        function cycleTheme() { 
+            if (currentMode === 'light') applyTheme('dark'); 
+            else if (currentMode === 'dark') applyTheme('system'); 
+            else applyTheme('light'); 
+        }
+
+        applyTheme(currentMode);
+
+        const ciudadesPorDepartamento = {
+            "asuncion": ["Asunción"],
+            "central": ["Areguá", "Capiatá", "Fernando de la Mora", "Guarambaré", "Itá", "Itauguá", "J. Augusto Saldívar", "Lambaré", "Limpio", "Luque", "Mariano Roque Alonso", "Nueva Italia", "Ñemby", "San Antonio", "San Lorenzo", "Villa Elisa", "Villeta", "Ypacaraí", "Ypané"],
+            "itapua": ["Alto Verá", "Bella Vista", "Cambyretá", "Capitán Meza", "Capitán Miranda", "Carlos Antonio López", "Carmen del Paraná", "Coronel Bogado", "Edelira", "Encarnación", "Fram", "General Artigas", "General Delgado", "Hohenau", "Itapúa Poty", "Jesús", "José Leandro Oviedo", "La Paz", "Mayor Otaño", "Natalio", "Nueva Alborada", "Obligado", "Pirapó", "San Cosme y Damián", "San Juan del Paraná", "San Pedro del Paraná", "Tomás Romero Pereira", "Trinidad", "Yatytay"],
+            "alto-parana": ["Ciudad del Este", "Doctor Juan León Mallorquín", "Doctor Raúl Peña", "Domingo Martínez de Irala", "Hernandarias", "Iruña", "Itakyry", "Juan Emilio O'Leary", "Los Cedrales", "Mbaracayú", "Minga Guazú", "Minga Porá", "Naranjal", "Ñacunday", "Presidente Franco", "San Alberto", "San Cristóbal", "Santa Fe del Paraná", "Santa Rita", "Santa Rosa del Monday", "Tavapy", "Yguazú"],
+            "guaira": ["Villarrica", "Borja", "Capitán Mauricio José Troche", "Coronel Martínez", "Doctor Botrell", "Félix Pérez Cardozo", "Independencia", "Itapé", "Iturbe", "José Fassardi", "Mbocayaty del Guairá", "Natalicio Talavera", "Ñumí", "Paso Yovai", "San Salvador", "Yataity del Guairá"],
+            "caaguazu": ["Coronel Oviedo", "Caaguazú", "Carayaó", "Doctor Cecilio Báez", "Doctor J. Eulogio Estigarribia", "Doctor Juan Manuel Frutos", "José Domingo Ocampos", "La Pastora", "Mariscal Francisco Solano López", "Nueva Londres", "Nueva Toledo", "Repatriación", "San Joaquín", "San José de los Arroyos", "Simón Bolívar", "Tembiaporá", "Vaquería", "Yhú"],
+            "cordillera": ["Caacupé", "Altos", "Arroyos y Esteros", "Atyrá", "Caraguatay", "Emboscada", "Eusebio Ayala", "Isla Pucú", "Itacurubí de la Cordillera", "Juan de Mena", "Loma Grande", "Mbocayaty del Yhaguy", "Nueva Colombia", "Piribebuy", "Primero de Marzo", "San Bernardino", "Santa Elena", "Tobatí", "Valenzuela"],
+            "amambay": ["Pedro Juan Caballero", "Bella Vista Norte", "Capitán Bado", "Zanja Pytã"],
+            "canindeyu": ["Salto del Guairá", "Corpus Christi", "Curuguaty", "Katueté", "La Paloma", "Villa Ygatimí", "Ypejhú"],
+            "misiones": ["San Juan Bautista", "Ayolas", "San Ignacio Guazú", "San Miguel", "San Patricio", "Santa Rosa", "Santiago", "Villa Florida", "Yabebyry"],
+            "paraguari": ["Paraguarí", "Acahay", "Carapeguá", "Escobar", "La Colmena", "Quiindy", "Yaguarón", "Ybycuí"],
+            "concepcion": ["Concepción", "Belén", "Horqueta", "Loreto", "San Lázaro", "Yby Yaú"],
+            "san-pedro": ["San Pedro de Ycuamandiyú", "Capiíbary", "Choré", "Guayaibí", "San Estanislao (Santaní)", "Santa Rosa del Aguaray"],
+            "neembucu": ["Pilar", "Alberdi", "Humaitá"],
+            "presidente-hayes": ["Villa Hayes", "Benjamín Aceval", "Nanawa", "Puerto Pinasco"],
+            "boqueron": ["Filadelfia", "Loma Plata", "Mariscal Estigarribia"],
+            "alto-paraguay": ["Fuerte Olimpo", "Bahía Negra", "Capitán Carmelo Peralta", "Puerto Casado"],
+            "caazapa": ["Caazapá", "Abaí", "San Juan Nepomuceno", "Yuty"]
+        };
+
+        const deptoContainer = document.getElementById('deptoSelectContainer');
+        const deptoTrigger = document.getElementById('deptoTrigger');
+        const deptoOptions = document.getElementById('deptoOptions');
+
+        const cityContainer = document.getElementById('citySelectContainer');
+        const cityTrigger = document.getElementById('cityTrigger');
+        const cityOptions = document.getElementById('cityOptions');
+
+        deptoTrigger.onclick = (e) => {
+            e.stopPropagation();
+            deptoContainer.classList.toggle('open');
+            cityContainer.classList.remove('open');
+        };
+
+        cityTrigger.onclick = (e) => {
+            e.stopPropagation();
+            if(!cityContainer.classList.contains('disabled')) {
+                cityContainer.classList.toggle('open');
+                deptoContainer.classList.remove('open');
+            }
+        };
+
+        window.onclick = () => {
+            deptoContainer.classList.remove('open');
+            cityContainer.classList.remove('open');
+        };
+
+        deptoOptions.querySelectorAll('.custom-option').forEach(option => {
+            option.onclick = () => {
+                deptoOptions.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                
+                const selectedDeptoName = option.textContent;
+                const deptoKey = option.getAttribute('data-value');
+                deptoTrigger.textContent = selectedDeptoName;
+                deptoContainer.classList.remove('open');
+
+                cityContainer.classList.remove('disabled');
+                cityTrigger.textContent = "Seleccioná una ciudad";
+
+                const listaCiudades = ciudadesPorDepartamento[deptoKey] || [];
+                cityOptions.innerHTML = '';
+                listaCiudades.forEach(ciudad => {
+                    const opt = document.createElement('div');
+                    opt.className = 'custom-option';
+                    opt.textContent = ciudad;
+                    opt.onclick = () => seleccionarCiudad(ciudad, opt);
+                    cityOptions.appendChild(opt);
+                });
+
+                document.getElementById('estadoFiltro').textContent = `📍 Departamento: ${selectedDeptoName}. Elegí una ciudad.`;
+            };
+        });
+
+        function seleccionarCiudad(ciudad, optElement) {
+            cityOptions.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+            optElement.classList.add('selected');
+
+            cityTrigger.textContent = ciudad;
+            cityContainer.classList.remove('open');
+
+            document.getElementById('estadoFiltro').textContent = `📍 Filtrando locales en: ${ciudad}`;
+        }
+
+        function activarCercaMio(btn) { 
+            document.querySelectorAll('.distance-chip').forEach(b => b.classList.remove('active')); 
+            btn.classList.add('active'); 
+            document.getElementById('estadoFiltro').textContent = navigator.geolocation ? "✅ Ubicación detectada: Mostrando locales cercanos" : "❌ Geolocalización no soportada"; 
+        }
+
+        function filtrarDistancia(km, btn) { 
+            document.querySelectorAll('.distance-chip').forEach(b => b.classList.remove('active')); 
+            btn.classList.add('active'); 
+            document.getElementById('estadoFiltro').textContent = `📍 Filtrando locales a un radio de ${km} km`; 
+        }
+    </script>
+</body>
+</html>

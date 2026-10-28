@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiTurnoPY - Conocé más</title>
+    <style>
+        :root {
+            --primary-color: #b8004f;
+            --primary-hover: #96003f;
+            --bg-color: #f7f9fc;
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --nav-bg: #b8004f;
+            --nav-text: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --footer-bg: #b8004f;
+            --footer-text: #ffffff;
+            --footer-muted: rgba(255, 255, 255, 0.85);
+            --shadow-color: rgba(15, 23, 42, 0.08);
+            --gradient-accent: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0b0106;
+            --text-color: #ffffff;
+            --text-muted: #b0b0b0;
+            --nav-bg: #1f0510;
+            --nav-text: #ffffff;
+            --card-bg: #15030c;
+            --card-border: #380d22;
+            --footer-bg: #1f0510;
+            --footer-text: #ffffff;
+            --footer-muted: #b0b0b0;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --gradient-accent: linear-gradient(135deg, #b8004f 0%, #e60067 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 75px;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            height: 50px;
+            width: 50px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .logo-text {
+            color: var(--nav-text);
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+            align-items: center;
+        }
+
+        nav ul li {
+            position: relative;
+        }
+
+        nav ul li a {
+            color: var(--nav-text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 10px 0;
+            display: block;
+        }
+
+        nav ul li a:hover {
+            opacity: 0.8;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            background: var(--nav-bg);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            width: 220px;
+            padding: 8px 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease-in-out;
+            z-index: 1100;
+        }
+
+        nav ul li.dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-menu a {
+            padding: 11px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--nav-text);
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background 0.2s ease, padding-left 0.2s ease;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            padding-left: 24px;
+            opacity: 1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+            padding: 9px 22px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.25s ease;
+        }
+
+        .btn-login:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-create {
+            background: #ffffff;
+            border: none;
+            color: var(--primary-color);
+            padding: 10px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        .btn-create:hover {
+            background: #fff0f5;
+            color: #96003f;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .about-page-container {
+            max-width: 1200px;
+            margin: 50px auto 80px auto;
+            padding: 0 40px;
+            width: 100%;
+        }
+
+        .page-title-area {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(184, 0, 79, 0.1);
+            color: var(--primary-color);
+            padding: 9px 22px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            border: 1.5px solid rgba(184, 0, 79, 0.3);
+            animation: pulseBadge 2.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseBadge {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(184, 0, 79, 0.3);
+            }
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 0 15px 4px rgba(184, 0, 79, 0.15);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(184, 0, 79, 0);
+            }
+        }
+
+        .page-title-area h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            letter-spacing: -1.5px;
+            line-height: 1.2;
+            color: var(--text-color);
+        }
+
+        .page-title-area h1 span {
+            color: var(--primary-color);
+        }
+
+        .page-title-area p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .about-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: stretch;
+            margin-bottom: 60px;
+        }
+
+        .about-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-accent);
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 40px rgba(184, 0, 79, 0.18);
+        }
+
+        .about-card h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .about-card p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .feature-highlights {
+            list-style: none;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .feature-highlights li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-highlights li::before {
+            content: "✓";
+            background: rgba(184, 0, 79, 0.12);
+            color: var(--primary-color);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .interactive-guide-container {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 24px;
+            padding: 50px 40px;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+        }
+
+        .guide-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .guide-header h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .guide-header p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .step-card {
+            background: var(--bg-color);
+            border: 2px solid var(--card-border);
+            border-radius: 18px;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .step-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary-color);
+            background: var(--card-bg);
+            box-shadow: 0 12px 25px rgba(184, 0, 79, 0.12);
+        }
+
+        .step-number {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-accent);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 4px 12px rgba(184, 0, 79, 0.3);
+        }
+
+        .step-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .step-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 900px) {
+            .about-section, .steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 20px 40px 12px 40px;
+            width: 100%;
+        }
+
+        .footer-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-brand {
+            max-width: 400px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .footer-logo img {
+            height: 28px;
+            width: 28px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .footer-logo span {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .footer-brand p {
+            font-size: 0.85rem;
+            color: var(--footer-muted);
+            line-height: 1.3;
+        }
+
+        .footer-links-group {
+            display: flex;
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .footer-col ul li a {
+            color: var(--footer-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .footer-col ul li a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            max-width: 1300px;
+            margin: 10px auto 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--footer-muted);
+        }
+
+        .footer-legal-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-legal-links a {
+            color: var(--footer-muted);
+            text-decoration: none;
+        }
+
+        .footer-legal-links a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" alt="MiTurnoPY Logo" onerror="this.style.display='none'">
+            <span class="logo-text">MiTurnoPY</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="peluquerias.html">Categorías ▾</a>
+                    <div class="dropdown-menu">
+                        <a href="peluquerias.html">Peluquerías</a>
+                        <a href="barberias.html">Barberías</a>
+                        <a href="maquillaje.html">Maquillaje</a>
+                        <a href="unas.html">Uñas</a>
+                        <a href="tatuajes.html">Tatuajes</a>
+                        <a href="salon.html">Salón de Belleza</a>
+                        <a href="estetica.html">Estética</a>
+                    </div>
+                </li>
+                <li><a href="planes.html">Planes</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="conoce-mas.html">Conocé más</a></li>
+            </ul>
+        </nav>
+        <div class="nav-buttons">
+            <button class="theme-toggle" id="themeToggleBtn" onclick="cycleTheme()" title="Cambiar modo">
+                <span id="themeIconContainer">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </span> 
+                <span id="themeText">Claro</span>
+            </button>
+            <a href="login.html" class="btn-login">Iniciá sesión</a>
+            <a href="register.html" class="btn-create">Crear YA</a>
+        </div>
+    </header>
+
+    <main class="about-page-container">
+        <div class="page-title-area">
+            <span class="hero-badge">Innovación en Gestión de Servicios</span>
+            <h1>Reimaginando la forma en que el Paraguay <span>conecta y agenda</span></h1>
+            <p>Una solución digital de alta eficiencia diseñada para transformar la operativa diaria de los negocios de estética y potenciar la experiencia de cada usuario a lo largo de todo el país.</p>
+        </div>
+
+        <section class="about-section">
+            <div class="about-card">
+                <h2>Para Clientes y Viajeros</h2>
+                <p>¿Estás de viaje por otra ciudad y no sabés dónde cortarte el cabello o hacerte las uñas? Con MiTurnoPY ingresás a la web, seleccionás tu ciudad y encontrás todos los locales disponibles.</p>
+                <ul class="feature-highlights">
+                    <li>Visualizá reseñas y reputación de cada local</li>
+                    <li>Ubicación exacta integrada en mapas</li>
+                    <li>Reserva instantánea en segundos</li>
+                </ul>
+            </div>
+            <div class="about-card">
+                <h2>Para Dueños de Negocios</h2>
+                <p>Gestioná tu local de manera totalmente automatizada. Visualizá tus turnos en vivo, cancelá, reagendá y recibí mensajes directos al instante cada vez que un cliente agende contigo.</p>
+                <ul class="feature-highlights">
+                    <li>Recordatorios inteligentes automáticos para eliminar ausencias</li>
+                    <li>Panel de control en tiempo real</li>
+                    <li>Mayor ocupación de agenda sin esfuerzo</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="about-section" style="margin-bottom: 60px;">
+            <div class="about-card">
+                <h2>Métodos de Pago y Activación</h2>
+                <p>Para garantizar la seguridad y formalidad en toda la red, los pagos de los planes se realizan mediante transferencias bancarias.</p>
+                <p>Una vez que realizás tu pago y nuestro equipo verifica los datos, tu local queda creado oficialmente, apareciendo de inmediato disponible en la web y en los mapas para todos los clientes.</p>
+                <ul class="feature-highlights">
+                    <li>Validación rápida y segura</li>
+                    <li>Aparición inmediata en mapas y listados</li>
+                    <li>Soporte directo vía WhatsApp</li>
+                </ul>
+            </div>
+            <div class="about-card">
+                <h2>Gestión Inteligente de Agenda</h2>
+                <p>Olvidate de las libretas de papel y los mensajes olvidados en WhatsApp. Nuestra herramienta centraliza toda la interacción con tus clientes para que optimices tus horarios diarios.</p>
+                <p>Diseñado exclusivamente para potenciar los negocios de belleza, barberías y estética en todo el territorio nacional.</p>
+                <ul class="feature-highlights">
+                    <li>Control absoluto desde cualquier dispositivo</li>
+                    <li>Historial de clientes frecuentes</li>
+                    <li>Cero complicaciones técnicas</li>
+                </ul>
+            </div>
+        </section>
+
+        <div class="interactive-guide-container">
+            <div class="guide-header">
+                <h2>¿Cómo funciona MiTurnoPY?</h2>
+                <p>Agendá o publicá tu servicio en solo tres simples pasos</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Buscá o Registrate</h3>
+                    <p>Seleccioná tu categoría de interés y ubicación actual, o creá el perfil de tu salón si sos dueño.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Elegí el Horario</h3>
+                    <p>Revisá la disponibilidad en tiempo real del profesional y seleccioná el turno que mejor se adapte a vos.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>¡Listo y Confirmado!</h3>
+                    <p>Recibí notificaciones automáticas y recordatorios directos para que nunca pierdas tu espacio reservado.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="logo.png" alt="MiTurnoPY Logo" onerror="this.style.display='none'">
+                    <span>MiTurnoPY</span>
+                </div>
+                <p>Reservas, clientes y gestión de agenda en un solo lugar. Diseñado exclusivamente para potenciar los negocios de belleza y estética en Paraguay.</p>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-col">
+                    <h4>Navegación</h4>
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="planes.html">Planes</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                        <li><a href="conoce-mas.html">Conocé más</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Soporte</h4>
+                    <ul>
+                        <li><a href="contacto.html">Ayuda y FAQ</a></li>
+                        <li><a href="mailto:soportemiturnopy@gmail.com">soportemiturnopy@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MiTurnoPY. Todos los derechos reservados • Encarnación, Paraguay • Contacto comercial: soportemiturnopy@gmail.com</p>
+            <div class="footer-legal-links">
+                <a href="terminos.html">Términos y Condiciones</a>
+                <span>•</span>
+                <a href="privacidad.html">Política de Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const body = document.body;
+        const iconContainer = document.getElementById('themeIconContainer');
+        const textSpan = document.getElementById('themeText');
+        let currentMode = localStorage.getItem('miturnopy_theme') || 'light';
+
+        const svgs = {
+            light: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+            dark: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            system: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+        };
+
+        function applyTheme(mode) {
+            currentMode = mode;
+            localStorage.setItem('miturnopy_theme', mode);
+            if (mode === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.system;
+                if(textSpan) textSpan.textContent = 'Sistema';
+            } else if (mode === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                if(iconContainer) iconContainer.innerHTML = svgs.dark;
+                if(textSpan) textSpan.textContent = 'Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.light;
+                if(textSpan) textSpan.textContent = 'Claro';
+            }
+        }
+
+        function cycleTheme() {
+            if (currentMode === 'light') applyTheme('dark');
+            else if (currentMode === 'dark') applyTheme('system');
+            else applyTheme('light');
+        }
+
+        applyTheme(currentMode);
+    </script>
+</body>
+</html>

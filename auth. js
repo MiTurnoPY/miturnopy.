@@ -1,0 +1,174 @@
+// auth.js - Sistema centralizado de Autenticación para MiTurnoPY
+
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Inyectar los estilos CSS de los modales directamente en la página
+    const modalCSS = `
+    <style>
+    .auth-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+    .auth-modal-content {
+        background: var(--card-bg, #ffffff);
+        border: 2px solid var(--primary-color, #b8004f);
+        padding: 35px;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 420px;
+        position: relative;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-color, #0f172a);
+    }
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 2px solid var(--card-border, #cbd5e1);
+        background: var(--bg-color, #f7f9fc);
+        color: var(--text-color, #0f172a);
+        font-size: 0.95rem;
+    }
+    .btn-auth-submit {
+        background: var(--primary-color, #b8004f);
+        color: #ffffff;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.2s;
+    }
+    .btn-auth-submit:hover {
+        background: var(--primary-hover, #96003f);
+    }
+    </style>`;
+
+    // 2. Inyectar la estructura HTML de los modales
+    const modalHTML = `
+    <div id="loginModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <span class="close-modal" onclick="cerrarModal('loginModal')">&times;</span>
+            <h2>Iniciar Sesión en MiTurnoPY</h2>
+            <form onsubmit="manejarLogin(event)">
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" required placeholder="tu@correo.com">
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-auth-submit">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <span class="close-modal" onclick="cerrarModal('registerModal')">&times;</span>
+            <h2>Registrá tu Salón o Barbería</h2>
+            <form onsubmit="manejarRegistro(event)">
+                <div class="form-group">
+                    <label>Nombre del Negocio</label>
+                    <input type="text" required placeholder="Ej: Barbería Central">
+                </div>
+                <div class="form-group">
+                    <label>Correo de Contacto</label>
+                    <input type="email" required placeholder="contacto@tunegocio.com">
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp / Teléfono</label>
+                    <input type="text" required placeholder="+595 981 ...">
+                </div>
+                <button type="submit" class="btn-auth-submit">Crear Mi Cuenta</button>
+            </form>
+        </div>
+    </div>`;
+
+    document.head.insertAdjacentHTML('beforeend', modalCSS);
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // 3. Conectar los botones de la barra de navegación de forma segura
+    const btnLogin = document.querySelector('.btn-login');
+    const btnCreate = document.querySelector('.btn-create');
+
+    if (btnLogin) {
+        btnLogin.addEventListener('click', () => {
+            document.getElementById('loginModal').style.display = 'flex';
+        });
+    }
+    if (btnCreate) {
+        btnCreate.addEventListener('click', () => {
+            document.getElementById('registerModal').style.display = 'flex';
+        });
+    }
+});
+
+function cerrarModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// 4. Inicializar Supabase con tus credenciales
+const SUPABASE_URL = 'https://astunocktidyecguufqw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Wbc3Zw3xqFC-8Pgu1ZnRmQ_Z9mXQXxz';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 5. Función real de Inicio de Sesión conectada a Supabase
+async function manejarLogin(e) {
+    e.preventDefault();
+    const emailInput = document.querySelector('#loginModal input[type="email"]').value;
+    const passwordInput = document.querySelector('#loginModal input[type="password"]').value;
+
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: emailInput,
+            password: passwordInput,
+        });
+
+        if (error) {
+            alert("Error al iniciar sesión: Verificá tu correo o contraseña.");
+            console.error(error.message);
+            return;
+        }
+
+        alert("¡Bienvenido de nuevo a MiTurnoPY, " + data.user.email + "!");
+        cerrarModal('loginModal');
+    } catch (err) {
+        console.error("Error inesperado:", err);
+        alert("Ocurrió un error al intentar conectar con el servidor.");
+    }
+}
+
+// 6. Función de Registro de Negocio
+async function manejarRegistro(e) {
+    e.preventDefault();
+    alert("¡Registro de negocio listo para conectarse con la base de datos!");
+    cerrarModal('registerModal');
+}

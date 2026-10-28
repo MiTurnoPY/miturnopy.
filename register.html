@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - MiTurnoPY</title>
+    <style>
+        :root {
+            --primary-color: #b8004f;
+            --primary-hover: #96003f;
+            --bg-color: #f7f9fc;
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --nav-bg: #b8004f;
+            --nav-text: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --glow-color: rgba(184, 0, 79, 0.15);
+            --tooltip-bg: #b8004f;
+            --tooltip-text: #ffffff;
+            --badge-bg: #fff1f2;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0b0106;
+            --text-color: #ffffff;
+            --text-muted: #b0b0b0;
+            --nav-bg: #1f0510;
+            --nav-text: #ffffff;
+            --card-bg: #15030c;
+            --card-border: #380d22;
+            --glow-color: rgba(184, 0, 79, 0.3);
+            --tooltip-bg: #ff4b91;
+            --tooltip-text: #0b0106;
+            --badge-bg: #2b0617;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 75px;
+            position: relative;
+            overflow-x: hidden;
+            animation: fadeInPage 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInPage {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 400px;
+            background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+            animation: pulseGlow 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+            100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            height: 50px;
+            width: 50px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .logo-text {
+            color: var(--nav-text);
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .theme-toggle { 
+            background: transparent; 
+            border: 2px solid rgba(255, 255, 255, 0.8); 
+            color: #ffffff; 
+            padding: 7px 14px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+        .theme-toggle:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .btn-back-nav {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+        }
+
+        .btn-back-nav:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .main-register-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.12);
+            text-align: center;
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .register-card h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .register-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .role-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .role-card {
+            background: var(--bg-color);
+            border: 2px solid var(--card-border);
+            padding: 22px;
+            border-radius: 18px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::after {
+            content: '→';
+            position: absolute;
+            right: 20px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(184, 0, 79, 0.18);
+            background: var(--card-bg);
+        }
+
+        .role-card:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .role-icon-wrapper {
+            width: 54px;
+            height: 54px;
+            background: rgba(184, 0, 79, 0.1);
+            border: 1px solid rgba(184, 0, 79, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .role-card:hover .role-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--primary-color);
+        }
+
+        .role-card:hover .role-icon-wrapper svg {
+            fill: #ffffff;
+        }
+
+        .role-icon-wrapper svg {
+            width: 26px;
+            height: 26px;
+            fill: var(--primary-color);
+            transition: fill 0.3s ease;
+        }
+
+        .role-info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .role-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .form-section {
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .btn-social {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .btn-social:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-google {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--card-border);
+        }
+
+        .btn-google:hover {
+            border-color: var(--primary-color);
+        }
+
+        .btn-apple {
+            background: #000000;
+            color: #ffffff;
+            border: 2px solid #000000;
+        }
+
+        .btn-apple:hover {
+            background: #222222;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 18px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .auth-divider::before, .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .auth-divider span {
+            padding: 0 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border-radius: 10px;
+            border: 2px solid var(--card-border);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .form-group input.no-icon {
+            padding-right: 15px;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(184, 0, 79, 0.15);
+        }
+
+        .custom-tooltip {
+            position: absolute;
+            top: 2px;
+            right: 12px;
+            background: var(--tooltip-bg);
+            color: var(--tooltip-text);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(184, 0, 79, 0.25);
+            display: none;
+            align-items: center;
+            gap: 5px;
+            animation: fadeInTooltip 0.2s ease forwards;
+            z-index: 10;
+        }
+
+        @keyframes fadeInTooltip {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-color);
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .terms-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            text-align: left;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-color);
+        }
+
+        .terms-checkbox input {
+            margin-top: 2px;
+            accent-color: var(--primary-color);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .terms-checkbox a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-auth-submit {
+            background: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.25s ease;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(184, 0, 79, 0.3);
+        }
+
+        .btn-auth-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 0, 79, 0.45);
+        }
+
+        .back-selection {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.2s;
+        }
+
+        .back-selection:hover {
+            transform: translateX(-3px);
+            text-decoration: underline;
+        }
+
+        .login-redirect {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .login-redirect a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .login-redirect a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Global Estilo MiTurnoPY */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-modal-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px 50px;
+            max-width: 520px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            transform: scale(0.6);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .success-modal-card {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .success-modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+        }
+
+        .success-icon-wrapper {
+            width: 65px;
+            height: 65px;
+            background: var(--badge-bg);
+            border: 2px solid rgba(184, 0, 79, 0.3);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px auto;
+            box-shadow: 0 8px 20px rgba(184, 0, 79, 0.2);
+        }
+
+        .success-modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .success-modal-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .success-modal-btn {
+            background: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(184, 0, 79, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .success-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(184, 0, 79, 0.45);
+        }
+
+        footer {
+            background-color: var(--nav-bg);
+            color: #ffffff;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 20px 40px 12px 40px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" alt="MiTurnoPY Logo" onerror="this.style.display='none'">
+            <span class="logo-text">MiTurnoPY</span>
+        </a>
+        <div class="nav-buttons">
+            <button class="theme-toggle" id="themeToggleBtn" onclick="cycleTheme()" title="Cambiar modo">
+                <span id="themeIconContainer">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </span> 
+                <span id="themeText">Claro</span>
+            </button>
+            <a href="index.html" class="btn-back-nav">Volver al Inicio</a>
+        </div>
+    </header>
+
+    <main class="main-register-container">
+        <div class="register-card">
+            
+            <!-- PASO 1: Selección de perfil generalizada -->
+            <div id="stepSelection" class="form-section active">
+                <h1>¿Cómo vas a usar MiTurnoPY?</h1>
+                <p class="register-subtitle">Elegí una opción para comenzar tu experiencia</p>
+                
+                <div class="role-selection">
+                    <div class="role-card" onclick="elegirRol('cliente')">
+                        <div class="role-icon-wrapper">
+                            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        </div>
+                        <div class="role-info">
+                            <h3>Soy cliente y busco turno</h3>
+                            <p>Encontrá peluquerías, barberías, estética, uñas, tatuajes y más.</p>
+                        </div>
+                    </div>
+
+                    <div class="role-card" onclick="elegirRol('negocio')">
+                        <div class="role-icon-wrapper">
+                            <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></svg>
+                        </div>
+                        <div class="role-info">
+                            <h3>Tengo un negocio o soy profesional</h3>
+                            <p>Gestioná tu agenda digital y recibí reservas online para cualquiera de nuestros rubros.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="login-redirect">
+                    ¿Ya tenés una cuenta? <a href="login.html">Iniciá sesión</a>
+                </div>
+            </div>
+
+            <!-- PASO 2A: Formulario para Cliente -->
+            <div id="stepCliente" class="form-section">
+                <button type="button" class="back-selection" onclick="volverSeleccion()">← Volver atrás</button>
+                <h1>Crear Cuenta de Cliente</h1>
+                <p class="register-subtitle">Registrate para guardar tus turnos y favoritos</p>
+
+                <button type="button" class="btn-social btn-google" onclick="loginSocial('google')">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.35 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.13 0 9.83 0 12s.43 3.87 1.18 5.39l4.09-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.65 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+                    Continuar con Google
+                </button>
+
+                <button type="button" class="btn-social btn-apple" onclick="loginSocial('apple')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 5.35c.61-.75 1.03-1.8 0.91-2.85-.88.04-1.95.59-2.58 1.34-.56.65-1.05 1.71-.92 2.74.98.08 1.98-.48 2.59-1.23z"/></svg>
+                    Continuar con Apple
+                </button>
+
+                <div class="auth-divider"><span>o con correo electrónico</span></div>
+
+                <form onsubmit="manejarRegistroCliente(event)" novalidate>
+                    <div class="form-group">
+                        <label>Nombre y Apellido</label>
+                        <input class="no-icon" type="text" id="cliNombre" placeholder="Tu nombre completo" oninput="limpiarErrorCliente('cliNombre')">
+                        <div class="custom-tooltip" id="tip-cliNombre">⚠️ Completá este campo</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input class="no-icon" type="email" id="cliEmail" placeholder="tu@correo.com" oninput="limpiarErrorCliente('cliEmail')">
+                        <div class="custom-tooltip" id="tip-cliEmail">⚠️ Ingresá un correo válido</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <div class="password-container">
+                            <input type="password" id="cliPassword" placeholder="Mínimo 8 caracteres (1 mayús, 1 minús)" oninput="limpiarErrorCliente('cliPassword')">
+                            <button type="button" class="toggle-password" onclick="togglePassword('cliPassword', this)">
+                                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                        <div class="custom-tooltip" id="tip-cliPassword">⚠️ Completá este campo</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Contraseña</label>
+                        <div class="password-container">
+                            <input type="password" id="cliPasswordConfirm" placeholder="Repetí la contraseña" oninput="limpiarErrorCliente('cliPasswordConfirm')">
+                            <button type="button" class="toggle-password" onclick="togglePassword('cliPasswordConfirm', this)">
+                                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                        <div class="custom-tooltip" id="tip-cliPasswordConfirm">⚠️ Completá este campo</div>
+                    </div>
+
+                    <div class="terms-container">
+                        <div class="terms-checkbox">
+                            <input type="checkbox" id="cliTerms">
+                            <label for="cliTerms">Acepto los <a href="#" target="_blank">Términos y Condiciones</a> de MiTurnoPY.</label>
+                        </div>
+                        <div class="terms-checkbox">
+                            <input type="checkbox" id="cliPrivacy">
+                            <label for="cliPrivacy">Acepto la <a href="#" target="_blank">Política de Privacidad</a> y el tratamiento de mis datos.</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit">Registrarse como Cliente</button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal de Alerta Estilo MiTurnoPY (Para Validaciones) -->
+    <div class="modal-overlay" id="customAlertModal">
+        <div class="success-modal-card">
+            <div class="success-icon-wrapper">
+                <svg viewBox="0 0 24 24" style="width:28px; height:28px; stroke:currentColor; stroke-width:2.5; fill:none; stroke-linecap:round; stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <h3 class="success-modal-title" id="alertModalTitle">Atención</h3>
+            <p class="success-modal-desc" id="alertModalDesc">Mensaje de alerta...</p>
+            <button type="button" class="success-modal-btn" onclick="cerrarAlertaModal()">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito de Registro de Cliente -->
+    <div class="modal-overlay" id="successModal">
+        <div class="success-modal-card">
+            <div class="success-icon-wrapper" style="color: #b8004f;">
+                <svg viewBox="0 0 24 24" style="width:32px; height:32px; stroke:currentColor; stroke-width:3; fill:none; stroke-linecap:round; stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h3 class="success-modal-title">¡Felicidades, ya sos cliente!</h3>
+            <p class="success-modal-desc">Tu cuenta ha sido creada exitosamente. Ya podés buscar profesionales y agendar turnos de forma rápida y sencilla.</p>
+            <button type="button" class="success-modal-btn" onclick="irAlDashboard()">Reservar tu turno</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 MiTurnoPY. Todos los derechos reservados • Encarnación, Paraguay</p>
+        </div>
+    </footer>
+
+    <!-- Transición suave de enlaces internos -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const links = document.querySelectorAll("a");
+
+            links.forEach(link => {
+                link.addEventListener("click", function(e) {
+                    const targetHref = this.getAttribute("href");
+
+                    if (
+                        targetHref &&
+                        !targetHref.startsWith("http") &&
+                        !targetHref.startsWith("#") &&
+                        !targetHref.startsWith("mailto") &&
+                        this.getAttribute("target") !== "_blank"
+                    ) {
+                        e.preventDefault();
+                        document.body.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+                        document.body.style.opacity = "0";
+                        document.body.style.transform = "translateY(-6px)";
+
+                        setTimeout(() => {
+                            window.location.href = targetHref;
+                        }, 250);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Sincronización robusta de Temas y Lógica de Registro Local -->
+    <script>
+        const body = document.body;
+        const iconContainer = document.getElementById('themeIconContainer');
+        const textSpan = document.getElementById('themeText');
+        let currentMode = localStorage.getItem('miturnopy_theme') || 'light';
+
+        const svgs = {
+            light: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+            dark: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            system: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+        };
+
+        function applyTheme(mode) {
+            currentMode = mode;
+            localStorage.setItem('miturnopy_theme', mode);
+            if (mode === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.system;
+                if(textSpan) textSpan.textContent = 'Sistema';
+            } else if (mode === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                if(iconContainer) iconContainer.innerHTML = svgs.dark;
+                if(textSpan) textSpan.textContent = 'Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.light;
+                if(textSpan) textSpan.textContent = 'Claro';
+            }
+        }
+
+        function cycleTheme() {
+            if (currentMode === 'light') applyTheme('dark');
+            else if (currentMode === 'dark') applyTheme('system');
+            else applyTheme('light');
+        }
+
+        applyTheme(currentMode);
+
+        function mostrarAlertaPersonalizada(titulo, mensaje) {
+            document.getElementById('alertModalTitle').textContent = titulo;
+            document.getElementById('alertModalDesc').textContent = mensaje;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('customAlertModal').classList.add('active');
+        }
+
+        function cerrarAlertaModal() {
+            document.getElementById('customAlertModal').classList.remove('active');
+        }
+
+        function elegirRol(rol) {
+            if (rol === 'negocio') {
+                window.location.href = 'crea.html';
+            } else {
+                document.getElementById('stepSelection').classList.remove('active');
+                document.getElementById('stepCliente').classList.add('active');
+            }
+        }
+
+        function volverSeleccion() {
+            document.getElementById('stepCliente').classList.remove('active');
+            document.getElementById('stepSelection').classList.add('active');
+        }
+
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+            } else {
+                input.type = "password";
+                btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+            }
+        }
+
+        function limpiarErrorCliente(id) {
+            const el = document.getElementById(id);
+            const tip = document.getElementById(`tip-${id}`);
+            if (el.value.trim()) {
+                el.style.borderColor = 'var(--card-border)';
+                if (tip) tip.style.display = 'none';
+            }
+        }
+
+        function irAlDashboard() {
+            window.location.href = 'index.html';
+        }
+
+        function loginSocial(provider) {
+            mostrarAlertaPersonalizada("Acceso Social", "La conexión con " + provider + " estará disponible cuando publiquemos la web en Vercel.");
+        }
+
+        function manejarRegistroCliente(e) {
+            e.preventDefault();
+            const campos = ['cliNombre', 'cliEmail', 'cliPassword', 'cliPasswordConfirm'];
+            let valido = true;
+
+            campos.forEach(id => {
+                const el = document.getElementById(id);
+                const tip = document.getElementById(`tip-${id}`);
+                if (!el.value.trim()) {
+                    el.style.borderColor = '#ef4444';
+                    if (tip) tip.style.display = 'flex';
+                    valido = false;
+                } else {
+                    el.style.borderColor = 'var(--card-border)';
+                    if (tip) tip.style.display = 'none';
+                }
+            });
+
+            if (!valido) return;
+
+            const email = document.getElementById('cliEmail').value.trim();
+            const password = document.getElementById('cliPassword').value;
+            const passwordConfirm = document.getElementById('cliPasswordConfirm').value;
+
+            // Validación estricta de formato de correo electrónico real
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('cliEmail').style.borderColor = '#ef4444';
+                document.getElementById('tip-cliEmail').textContent = "⚠️ Ingresá un correo válido";
+                document.getElementById('tip-cliEmail').style.display = 'flex';
+                mostrarAlertaPersonalizada("Correo Inválido", "Por favor, ingresá una dirección de correo electrónico real y válida (ejemplo: tu@correo.com).");
+                return;
+            }
+
+            // Validación de Contraseña: Mínimo 8 caracteres, 1 mayúscula y 1 minúscula
+            const tieneMinLength = password.length >= 8;
+            const tieneMayuscula = /[A-Z]/.test(password);
+            const tieneMinuscula = /[a-z]/.test(password);
+
+            if (!tieneMinLength || !tieneMayuscula || !tieneMinuscula) {
+                document.getElementById('cliPassword').style.borderColor = '#ef4444';
+                mostrarAlertaPersonalizada(
+                    "Contraseña Segura Requerida", 
+                    "La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula y una letra minúscula para continuar."
+                );
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                document.getElementById('cliPasswordConfirm').style.borderColor = '#ef4444';
+                mostrarAlertaPersonalizada("Contraseñas Divergentes", "Las contraseñas no coinciden. Por favor, verificá los campos.");
+                return;
+            }
+
+            // Validación de Términos y Condiciones y Política de Privacidad
+            const terms = document.getElementById('cliTerms').checked;
+            const privacy = document.getElementById('cliPrivacy').checked;
+            if (!terms || !privacy) {
+                mostrarAlertaPersonalizada(
+                    "Aceptación Obligatoria", 
+                    "Debes aceptar los Términos y Condiciones y la Política de Privacidad de MiTurnoPY para poder registrarte."
+                );
+                return;
+            }
+
+            // Éxito: Muestra el modal estilizado sin depender de servidores externos
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('successModal').classList.add('active');
+        }
+    </script>
+</body>
+</html>

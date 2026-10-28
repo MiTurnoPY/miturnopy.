@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiTurnoPY - La evolución en la gestión de turnos</title>
+    <style>
+        :root {
+            --primary-color: #b8004f;
+            --primary-hover: #96003f;
+            --bg-color: #f7f9fc;
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --nav-bg: #b8004f;
+            --nav-text: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --footer-bg: #b8004f;
+            --footer-text: #ffffff;
+            --footer-muted: rgba(255, 255, 255, 0.85);
+            --icon-filter: brightness(0) saturate(100%);
+            --event-bg: #fff1f2;
+            --event-border: rgba(184, 0, 79, 0.25);
+            --shadow-color: rgba(15, 23, 42, 0.08);
+            --gradient-accent: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #070003;
+            --text-color: #ffffff;
+            --text-muted: #b0b0b0;
+            --nav-bg: #1f0510;
+            --nav-text: #ffffff;
+            --card-bg: #130209;
+            --card-border: #380d22;
+            --footer-bg: #1f0510;
+            --footer-text: #ffffff;
+            --footer-muted: #b0b0b0;
+            --icon-filter: brightness(1) invert(0);
+            --event-bg: #2b0617;
+            --event-border: rgba(184, 0, 79, 0.4);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --gradient-accent: linear-gradient(135deg, #b8004f 0%, #e60067 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 75px;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            height: 50px;
+            width: 50px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .logo-text {
+            color: var(--nav-text);
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+            align-items: center;
+        }
+
+        nav ul li {
+            position: relative;
+        }
+
+        nav ul li a {
+            color: var(--nav-text);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 10px 0;
+            display: block;
+        }
+
+        nav ul li a:hover {
+            opacity: 0.8;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            background: var(--nav-bg);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            width: 220px;
+            padding: 8px 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease-in-out;
+            z-index: 1100;
+        }
+
+        nav ul li.dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-menu a {
+            padding: 11px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--nav-text);
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background 0.2s ease, padding-left 0.2s ease;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            padding-left: 24px;
+            opacity: 1;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+            padding: 9px 22px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.25s ease;
+        }
+
+        .btn-login:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-create {
+            background: #ffffff;
+            border: none;
+            color: var(--primary-color);
+            padding: 10px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease;
+            display: inline-block;
+        }
+
+        .btn-create:hover {
+            background: #fff0f5;
+            color: #96003f;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* Hero Centralizado */
+        .radical-hero {
+            max-width: 1200px;
+            margin: 60px auto 40px auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 50px;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-radical-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-radical-content h1 {
+            font-size: 3.8rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
+            color: var(--text-color);
+        }
+
+        .hero-radical-content h1 span {
+            color: var(--primary-color);
+        }
+
+        .hero-radical-content p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 35px;
+            max-width: 550px;
+        }
+
+        .hero-action-set {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-radical-main {
+            background: var(--gradient-accent);
+            color: #ffffff;
+            border: none;
+            padding: 15px 32px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(184, 0, 79, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .btn-radical-main:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(184, 0, 79, 0.5);
+        }
+
+        .btn-radical-sub {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--card-border);
+            padding: 15px 28px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-radical-sub:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+        }
+
+        .client-link-radical {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .client-link-radical:hover {
+            color: var(--primary-color);
+        }
+
+        .radical-card-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 30px;
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0 20px 45px var(--shadow-color);
+            transform: perspective(1000px) rotateY(-4deg) rotateX(4deg);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card:hover {
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+            box-shadow: 0 25px 50px rgba(184, 0, 79, 0.2);
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--gradient-accent);
+        }
+
+        .card-header-dynamic {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 15px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            background: var(--event-bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--event-border);
+        }
+
+        .live-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(184, 0, 79, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(184, 0, 79, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(184, 0, 79, 0); }
+        }
+
+        .card-date-info {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+
+        .cal-col {
+            background: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 12px 4px;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+        }
+
+        .cal-col:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+        }
+
+        .cal-day {
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            color: var(--text-color);
+        }
+
+        .cal-event {
+            background-color: var(--event-bg);
+            color: var(--primary-color);
+            border: 1px solid var(--event-border);
+            border-radius: 8px;
+            padding: 7px 2px;
+            font-size: 0.7rem;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        /* Categorías */
+        .categories-quick-section {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 30px;
+            width: 100%;
+        }
+
+        .section-radical-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-radical-title h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .section-radical-title p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 16px;
+        }
+
+        .quick-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 22px;
+            padding: 28px 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 35px rgba(184, 0, 79, 0.2);
+        }
+
+        .quick-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .quick-icon-img {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            filter: var(--icon-filter);
+            transition: transform 0.35s ease;
+        }
+
+        .quick-card:hover .quick-icon-img {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .quick-card span {
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        /* Beneficios */
+        .features-section {
+            max-width: 1200px;
+            margin: 0 auto 100px auto;
+            padding: 0 30px;
+            width: 100%;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 35px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 28px;
+            padding: 45px 35px;
+            box-shadow: 0 15px 35px var(--shadow-color);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 25px 50px rgba(184, 0, 79, 0.18);
+        }
+
+        .feature-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background: var(--event-bg);
+            border: 2px solid var(--event-border);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 28px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon-wrapper {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .feature-icon-wrapper svg {
+            width: 34px;
+            height: 34px;
+            fill: var(--primary-color);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
+        }
+
+        .feature-card p {
+            font-size: 1.02rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 20px 40px 12px 40px;
+            width: 100%;
+        }
+
+        .footer-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-brand {
+            max-width: 400px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .footer-logo img {
+            height: 28px;
+            width: 28px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .footer-logo span {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .footer-brand p {
+            font-size: 0.85rem;
+            color: var(--footer-muted);
+            line-height: 1.3;
+        }
+
+        .footer-links-group {
+            display: flex;
+            gap: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .footer-col ul li a {
+            color: var(--footer-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .footer-col ul li a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            max-width: 1300px;
+            margin: 10px auto 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--footer-muted);
+        }
+
+        .footer-legal-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-legal-links a {
+            color: var(--footer-muted);
+            text-decoration: none;
+        }
+
+        .footer-legal-links a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        /* ADAPTABILIDAD RESPONSIVE PARA CELULARES Y TABLETS (Sin tocar el diseño de notebook) */
+        @media (max-width: 1024px) {
+            header {
+                padding: 15px 20px;
+            }
+            .radical-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 40px;
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+            .hero-radical-content h1 {
+                font-size: 2.8rem;
+            }
+            .hero-radical-content p {
+                margin: 0 auto 35px auto;
+            }
+            .hero-action-set {
+                justify-content: center;
+            }
+            .quick-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+            .categories-quick-section, .features-section {
+                padding: 0 20px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header nav ul {
+                display: none; /* Ocultar menú superior en móviles para evitar saturación, o apilarlo */
+            }
+            .hero-radical-content h1 {
+                font-size: 2.2rem;
+            }
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .calendar-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .hero-card {
+                transform: none; /* Quitar efecto 3D rotado en celulares para lectura limpia */
+            }
+            .footer-links-group {
+                gap: 20px;
+                flex-direction: column;
+            }
+            .footer-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" alt="MiTurnoPY Logo" onerror="this.style.display='none'">
+            <span class="logo-text">MiTurnoPY</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li class="dropdown">
+                    <a href="peluquerias.html">Categorías ▾</a>
+                    <div class="dropdown-menu">
+                        <a href="peluquerias.html">Peluquerías</a>
+                        <a href="barberias.html">Barberías</a>
+                        <a href="maquillaje.html">Maquillaje</a>
+                        <a href="unas.html">Uñas</a>
+                        <a href="tatuajes.html">Tatuajes</a>
+                        <a href="salon.html">Salón de Belleza</a>
+                        <a href="estetica.html">Estética</a>
+                    </div>
+                </li>
+                <li><a href="planes.html">Planes</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="conoce-mas.html">Conocé más</a></li>
+            </ul>
+        </nav>
+        <div class="nav-buttons">
+            <button class="theme-toggle" id="themeToggleBtn" onclick="cycleTheme()" title="Cambiar modo">
+                <span id="themeIconContainer">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span> 
+                <span id="themeText">Oscuro</span>
+            </button>
+            <a href="login.html" class="btn-login">Iniciá sesión</a>
+            <a href="crea.html" class="btn-create">Crear YA</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO CENTRALIZADO SIN RECUADRO Y CON LETRAS NÍTIDAS -->
+        <section class="radical-hero">
+            <div class="hero-radical-content">
+                <h1>Tu salón al siguiente nivel, <span>agenda inteligente</span></h1>
+                <p>La plataforma definitiva en Paraguay para potenciar tu salón, estética o barbería con reservas en línea automáticas y cero fricción operativa.</p>
+                <div class="hero-action-set">
+                    <a href="crea.html" class="btn-radical-main">Empezá gratis hoy</a>
+                    <a href="conoce-mas.html" class="btn-radical-sub">Conocé más</a>
+                </div>
+                <div>
+                    <a href="peluquerias.html" class="client-link-radical">Soy cliente y busco turno</a>
+                </div>
+            </div>
+
+            <div class="radical-card-wrapper">
+                <div class="hero-card">
+                    <div class="card-header-dynamic">
+                        <div class="live-badge">
+                            <div class="live-pulse"></div>
+                            <span>Agenda en vivo</span>
+                        </div>
+                        <span class="card-date-info">Paraguay • Octubre</span>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="cal-col">
+                            <div class="cal-day">LUN 10</div>
+                            <div class="cal-event">09:00 - Corte</div>
+                            <div class="cal-event">11:00 - Barba</div>
+                        </div>
+                        <div class="cal-col">
+                            <div class="cal-day">MAR 11</div>
+                            <div class="cal-event">10:00 - Uñas</div>
+                        </div>
+                        <div class="cal-col">
+                            <div class="cal-day">MIÉ 12</div>
+                            <div class="cal-event">09:00 - MakeUp</div>
+                            <div class="cal-event">14:00 - Estética</div>
+                        </div>
+                        <div class="cal-col">
+                            <div class="cal-day">JUE 13</div>
+                            <div class="cal-event">15:30 - Tatuaje</div>
+                        </div>
+                        <div class="cal-col">
+                            <div class="cal-day">VIE 14</div>
+                            <div class="cal-event">16:00 - Salón</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MOSAICO FLOTANTE DE CATEGORÍAS -->
+        <section class="categories-quick-section">
+            <div class="section-radical-title">
+                <h2>Explorá por Categorías</h2>
+                <p>Encontrá tu espacio ideal en segundos</p>
+            </div>
+            <div class="quick-grid">
+                <a href="peluquerias.html" class="quick-card">
+                    <img src="peluqueria.png" alt="Peluquerías" class="quick-icon-img">
+                    <span>Peluquerías</span>
+                </a>
+                <a href="barberias.html" class="quick-card">
+                    <img src="barberia.png" alt="Barberías" class="quick-icon-img">
+                    <span>Barberías</span>
+                </a>
+                <a href="maquillaje.html" class="quick-card">
+                    <img src="maquillaje.png" alt="Maquillaje" class="quick-icon-img">
+                    <span>Maquillaje</span>
+                </a>
+                <a href="unas.html" class="quick-card">
+                    <img src="unas.png" alt="Uñas" class="quick-icon-img">
+                    <span>Uñas</span>
+                </a>
+                <a href="tatuajes.html" class="quick-card">
+                    <img src="tatuajes.png" alt="Tatuajes" class="quick-icon-img">
+                    <span>Tatuajes</span>
+                </a>
+                <a href="salon.html" class="quick-card">
+                    <img src="salon.png" alt="Salón" class="quick-icon-img">
+                    <span>Salón</span>
+                </a>
+                <a href="estetica.html" class="quick-card">
+                    <img src="estetica.png" alt="Estética" class="quick-icon-img">
+                    <span>Estética</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- TARJETAS PRISMÁTICAS DE BENEFICIOS -->
+        <section class="features-section">
+            <div class="section-radical-title">
+                <h2>Todo lo que tu negocio necesita</h2>
+                <p>Herramientas profesionales diseñadas para potenciar tu productividad diaria</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                    </div>
+                    <h3>Enlaces para cada servicio o salón</h3>
+                    <p>Obtené un enlace único y personalizado (ej. miturnopy.com/tu-salon) para compartir en tus redes sociales, WhatsApp o Instagram y recibir reservas directas sin intermediarios.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+                    </div>
+                    <h3>Notificaciones inteligentes</h3>
+                    <p>El sistema envía alertas en tiempo real de cada reserva nueva y recordatorios automáticos previos a tus clientes para eliminar los faltazos y asegurar el 100% de asistencia.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                    </div>
+                    <h3>Control total de la agenda</h3>
+                    <p>Decile adiós a las libretas de papel. Visualizá de forma clara y unificada los turnos de todo tu equipo en tiempo real desde cualquier dispositivo y sin cruces de horarios.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="logo.png" alt="MiTurnoPY Logo" onerror="this.style.display='none'">
+                    <span>MiTurnoPY</span>
+                </div>
+                <p>Reservas, clientes y gestión de agenda en un solo lugar. Diseñado exclusivamente para potenciar los negocios de belleza y estética en Paraguay.</p>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-col">
+                    <h4>Navegación</h4>
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="planes.html">Planes</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                        <li><a href="conoce-mas.html">Conocé más</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Soporte</h4>
+                    <ul>
+                        <li><a href="contacto.html">Ayuda y FAQ</a></li>
+                        <li><a href="mailto:soportemiturnopy@gmail.com">soportemiturnopy@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MiTurnoPY. Todos los derechos reservados • Encarnación, Paraguay • Contacto comercial: soportemiturnopy@gmail.com</p>
+            <div class="footer-legal-links">
+                <a href="terminos.html">Términos y Condiciones</a>
+                <span>•</span>
+                <a href="privacidad.html">Política de Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Sincronización de temas y transiciones -->
+    <script>
+        const body = document.body;
+        const iconContainer = document.getElementById('themeIconContainer');
+        const textSpan = document.getElementById('themeText');
+        let currentMode = localStorage.getItem('miturnopy_theme') || 'dark';
+
+        const svgs = {
+            light: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+            dark: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            system: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+        };
+
+        function applyTheme(mode) {
+            currentMode = mode;
+            localStorage.setItem('miturnopy_theme', mode);
+            if (mode === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.system;
+                if(textSpan) textSpan.textContent = 'Sistema';
+            } else if (mode === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                if(iconContainer) iconContainer.innerHTML = svgs.dark;
+                if(textSpan) textSpan.textContent = 'Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.light;
+                if(textSpan) textSpan.textContent = 'Claro';
+            }
+        }
+
+        function cycleTheme() {
+            if (currentMode === 'dark') applyTheme('light');
+            else if (currentMode === 'light') applyTheme('system');
+            else applyTheme('dark');
+        }
+
+        applyTheme(currentMode);
+    </script>
+</body>
+</html>

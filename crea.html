@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiTurnoPY - Registrar y Configurar Local</title>
+    <style>
+        :root {
+            --primary-color: #b8004f;
+            --primary-hover: #96003f;
+            --bg-color: #f6f8fb;
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --nav-bg: #b8004f;
+            --nav-text: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --footer-bg: #b8004f;
+            --footer-text: #ffffff;
+            --footer-muted: rgba(255, 255, 255, 0.85);
+            --shadow-color: rgba(15, 23, 42, 0.1);
+            --gradient-accent: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+            --badge-bg: #fff1f2;
+            --badge-border: rgba(184, 0, 79, 0.3);
+            --tooltip-bg: #b8004f;
+            --tooltip-text: #ffffff;
+            --upload-bg: #f1f5f9;
+            --plan-card-bg: #ffffff;
+            --plan-card-border: #cbd5e1;
+            --input-bg: #ffffff;
+            --accent-glow: rgba(184, 0, 79, 0.25);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0b0106;
+            --text-color: #ffffff;
+            --text-muted: #b0b0b0;
+            --nav-bg: #1f0510;
+            --nav-text: #ffffff;
+            --card-bg: #15030c;
+            --card-border: #380d22;
+            --footer-bg: #1f0510;
+            --footer-text: #ffffff;
+            --footer-muted: #b0b0b0;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --gradient-accent: linear-gradient(135deg, #b8004f 0%, #e60067 100%);
+            --badge-bg: #2b0617;
+            --badge-border: rgba(184, 0, 79, 0.4);
+            --tooltip-bg: #ff4b91;
+            --tooltip-text: #0b0106;
+            --upload-bg: #1f0510;
+            --plan-card-bg: #15030c;
+            --plan-card-border: #380d22;
+            --input-bg: #0b0106;
+            --accent-glow: rgba(255, 75, 145, 0.35);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 75px;
+            overflow-x: hidden;
+            animation: fadeInPage 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            height: 50px;
+            width: 50px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .logo-text {
+            color: var(--nav-text);
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+            padding: 9px 22px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.25s ease;
+        }
+
+        .btn-login:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .theme-toggle:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .register-page-container {
+            max-width: 820px;
+            margin: 40px auto 70px auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .register-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px 45px;
+            box-shadow: 0 15px 35px var(--shadow-color);
+            position: relative;
+        }
+
+        .register-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-accent);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .register-header h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .promo-badge-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .promo-badge {
+            display: inline-block;
+            background: var(--badge-bg);
+            color: var(--primary-color);
+            border: 1.5px solid var(--badge-border);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(184, 0, 79, 0.12);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .promo-badge:hover {
+            transform: translateY(-5px) scale(1.06);
+            box-shadow: 0 10px 25px rgba(184, 0, 79, 0.28);
+            background: var(--primary-color);
+            color: #ffffff;
+            border-color: var(--primary-color);
+        }
+
+        .register-header p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .dynamic-steps {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .step-box {
+            background: var(--input-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .step-box.active {
+            border-color: var(--primary-color);
+            background: var(--badge-bg);
+        }
+
+        .step-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--card-border);
+            color: var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-box.active .step-icon {
+            background: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(184, 0, 79, 0.4);
+        }
+
+        .step-content h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-box.active .step-content h4 {
+            color: var(--primary-color);
+        }
+
+        .step-content p {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            grid-column: span 2;
+            position: relative;
+        }
+
+        .form-group.half {
+            grid-column: span 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid var(--card-border);
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, 
+        .schedule-simple-inputs input[type="time"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            accent-color: var(--primary-color);
+            outline: none;
+        }
+
+        ::selection {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+
+        .custom-tooltip {
+            position: absolute;
+            top: 4px;
+            right: 12px;
+            background: var(--tooltip-bg);
+            color: var(--tooltip-text);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(184, 0, 79, 0.25);
+            display: none;
+            align-items: center;
+            gap: 5px;
+            animation: fadeInTooltip 0.2s ease forwards;
+            z-index: 10;
+        }
+
+        @keyframes fadeInTooltip {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phone-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .whatsapp-wrapper-clean {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-icon-btn-fixed {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: var(--input-bg);
+            border: 2px solid var(--card-border);
+            cursor: pointer;
+            flex-shrink: 0;
+            text-decoration: none;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .social-icon-btn-fixed:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+            background: var(--badge-bg);
+        }
+
+        .social-icon-btn-fixed svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .whatsapp-input-group {
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            background: var(--input-bg);
+            overflow: hidden;
+            flex-grow: 1;
+            transition: all 0.2s ease;
+        }
+
+        .whatsapp-input-group:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .whatsapp-prefix {
+            padding: 0 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.05);
+            border-right: 2px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        [data-theme="dark"] .whatsapp-prefix {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .whatsapp-input-group input {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-color);
+        }
+
+        .terms-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+            background: var(--input-bg);
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.88rem;
+            color: var(--text-color);
+        }
+
+        .terms-checkbox input {
+            margin-top: 2px;
+            accent-color: var(--primary-color);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .terms-checkbox a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        .setup-section-box {
+            background: var(--upload-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .setup-section-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+
+        .setup-section-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        .plans-grid-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 15px;
+        }
+
+        .plan-option-card {
+            background: var(--plan-card-bg);
+            border: 2px solid var(--plan-card-border);
+            border-radius: 16px;
+            padding: 24px 15px 20px 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+        }
+
+        .plan-option-card input[type="radio"] {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            accent-color: var(--primary-color);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .plan-option-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(184, 0, 79, 0.3);
+            white-space: nowrap;
+        }
+
+        .plan-option-card.selected {
+            border-color: var(--primary-color);
+            background: var(--badge-bg);
+            box-shadow: 0 8px 20px rgba(184, 0, 79, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .plan-option-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .plan-option-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+
+        .plan-option-price {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .plan-option-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .schedule-simple-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--input-bg);
+            border: 2px solid var(--card-border);
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            gap: 15px;
+        }
+
+        .schedule-simple-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            min-width: 130px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .schedule-simple-left input {
+            accent-color: var(--primary-color);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .schedule-simple-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .schedule-simple-inputs input[type="time"] {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 2px solid var(--card-border);
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 0.95rem;
+            font-weight: 700;
+            outline: none;
+            width: 125px;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.4);
+        }
+
+        [data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.9);
+        }
+
+        .schedule-closed-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            background: var(--card-bg);
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px dashed var(--card-border);
+            font-weight: 600;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .logo-preview-box {
+            width: 130px;
+            height: 130px;
+            background: var(--input-bg);
+            border: 2px dashed var(--card-border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .banner-preview-box {
+            width: 100%;
+            height: 110px;
+            background: var(--input-bg);
+            border: 2px dashed var(--card-border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            overflow: hidden;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .file-upload-btn-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-file-custom {
+            background: var(--input-bg);
+            border: 2px solid var(--card-border);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-file-custom:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-file-delete {
+            background: transparent;
+            border: 2px solid #ef4444;
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: none;
+        }
+
+        .btn-file-delete:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .file-name-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .map-preview-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 220px;
+            border-radius: 14px;
+            border: 2px solid var(--card-border);
+            overflow: hidden;
+            margin-top: 12px;
+            background: var(--input-bg);
+            text-decoration: none;
+        }
+
+        .map-preview-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+        }
+
+        .map-overlay-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(184, 0, 79, 0.95);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            pointer-events: none;
+            transition: transform 0.2s ease;
+        }
+
+        .map-preview-wrapper:hover .map-overlay-badge {
+            transform: scale(1.05);
+        }
+
+        .social-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .social-input-wrapper input {
+            padding-left: 45px !important;
+        }
+
+        .social-icon-link {
+            position: absolute;
+            left: 12px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+            text-decoration: none;
+        }
+
+        [data-theme="dark"] .social-icon-link {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .social-icon-link:hover {
+            transform: scale(1.15);
+            background: rgba(184, 0, 79, 0.15);
+        }
+
+        .social-icon-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-submit-register {
+            background: var(--gradient-accent);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(184, 0, 79, 0.3);
+            transition: all 0.25s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(184, 0, 79, 0.45);
+        }
+
+        .btn-back-step {
+            background: transparent;
+            border: 2px solid var(--card-border);
+            color: var(--text-color);
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-back-step:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: var(--badge-bg);
+        }
+
+        .btn-back-step svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-modal-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px 50px;
+            max-width: 520px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            transform: scale(0.6);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .success-modal-card {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .success-modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--gradient-accent);
+        }
+
+        .success-icon-wrapper {
+            width: 65px;
+            height: 65px;
+            background: var(--badge-bg);
+            border: 2px solid var(--badge-border);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px auto;
+            box-shadow: 0 8px 20px rgba(184, 0, 79, 0.2);
+        }
+
+        .success-icon-wrapper svg {
+            width: 32px;
+            height: 32px;
+            stroke: currentColor;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .success-modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .success-modal-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .success-modal-btn {
+            background: var(--gradient-accent);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(184, 0, 79, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .success-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(184, 0, 79, 0.45);
+        }
+
+        @media (max-width: 750px) {
+            .plans-grid-selector { grid-template-columns: 1fr; gap: 25px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.half { grid-column: span 2; }
+            .dynamic-steps { grid-template-columns: 1fr; }
+            .upload-grid { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+            .register-card { padding: 25px; }
+            .success-modal-card { padding: 30px 20px; }
+            .schedule-simple-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 20px 40px 12px 40px;
+            width: 100%;
+        }
+
+        .footer-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .footer-brand { max-width: 400px; }
+        .footer-logo { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .footer-logo img { height: 28px; width: 28px; object-fit: contain; border-radius: 6px; }
+        .footer-logo span { font-size: 1.15rem; font-weight: bold; color: #ffffff; }
+        .footer-brand p { font-size: 0.85rem; color: var(--footer-muted); line-height: 1.3; }
+        .footer-links-group { display: flex; gap: 40px; }
+        .footer-col h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; color: #ffffff; }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+        .footer-col ul li a { color: var(--footer-muted); text-decoration: none; font-size: 0.85rem; }
+        .footer-col ul li a:hover { color: #ffffff; text-decoration: underline; }
+        .footer-bottom { max-width: 1300px; margin: 10px auto 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: 0.8rem; color: var(--footer-muted); }
+        .footer-legal-links { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .footer-legal-links a { color: var(--footer-muted); text-decoration: none; }
+        .footer-legal-links a:hover { color: #ffffff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" alt="MiTurnoPY Logo" onerror="this.style.display='none'">
+            <span class="logo-text">MiTurnoPY</span>
+        </a>
+        <div class="nav-buttons">
+            <button class="theme-toggle" id="themeToggleBtn" onclick="cycleTheme()" title="Cambiar modo">
+                <span id="themeIconContainer">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </span> 
+                <span id="themeText">Claro</span>
+            </button>
+            <a href="login.html" class="btn-login">Iniciá sesión</a>
+        </div>
+    </header>
+
+    <main class="register-page-container">
+        <div class="register-card">
+            
+            <!-- PASO 1: REGISTRAR OPERADOR -->
+            <div id="viewStep1">
+                <div class="register-header">
+                    <div class="promo-badge-wrapper">
+                        <div class="promo-badge">15 Días de Prueba Gratis</div>
+                    </div>
+                    <h1>Registrar Operador</h1>
+                    <p>Creá tu cuenta ahora para empezar tu prueba gratuita. Luego pasaremos a la activación de tu local.</p>
+                </div>
+
+                <div class="dynamic-steps">
+                    <div class="step-box active" id="indicator1">
+                        <div class="step-icon">1</div>
+                        <div class="step-content">
+                            <h4>Paso 1</h4>
+                            <p>Tus Datos y Cuenta</p>
+                        </div>
+                    </div>
+                    <div class="step-box" id="indicator2">
+                        <div class="step-icon">2</div>
+                        <div class="step-content">
+                            <h4>Paso 2</h4>
+                            <p>Activación y Local</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="registroForm" onsubmit="avanzarAlPaso2(event)" novalidate>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre y Apellido</label>
+                            <input type="text" id="nombreCompleto" placeholder="Ej: Juan Pérez" oninput="guardarDatosTemporales()">
+                            <div class="custom-tooltip" id="tip-nombreCompleto">⚠️ Completá este campo</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="correo" placeholder="tu@correo.com" oninput="guardarDatosTemporales()">
+                            <div class="custom-tooltip" id="tip-correo">⚠️ Completá este campo</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Número de Teléfono</label>
+                            <div class="phone-input-group">
+                                <select id="countryCode" onchange="guardarDatosTemporales()">
+                                    <option value="+595" selected>🇵🇾 +595</option>
+                                    <option value="+54">🇦🇷 +54</option>
+                                    <option value="+55">🇧🇷 +55</option>
+                                </select>
+                                <input type="tel" id="telefono" placeholder="981 123456" oninput="guardarDatosTemporales()">
+                            </div>
+                            <div class="custom-tooltip" id="tip-telefono">⚠️ Completá este campo</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Número de C.I. (Cédula de Identidad)</label>
+                            <input type="text" id="cedula" placeholder="Ej: 1234567" oninput="guardarDatosTemporales()">
+                            <div class="custom-tooltip" id="tip-cedula">⚠️ Completá este campo</div>
+                        </div>
+
+                        <div class="form-group half">
+                            <label>Contraseña</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="password" placeholder="Mínimo 8 caracteres (1 mayús, 1 minús)" oninput="guardarDatosTemporales()">
+                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password', 'eyeIcon1')">
+                                    <svg id="eyeIcon1" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                </button>
+                            </div>
+                            <div class="custom-tooltip" id="tip-password">⚠️ Completá este campo</div>
+                        </div>
+
+                        <div class="form-group half">
+                            <label>Confirmar Contraseña</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="confirmPassword" placeholder="Repetí la contraseña" oninput="guardarDatosTemporales()">
+                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPassword', 'eyeIcon2')">
+                                    <svg id="eyeIcon2" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                </button>
+                            </div>
+                            <div class="custom-tooltip" id="tip-confirmPassword">⚠️ Completá este campo</div>
+                        </div>
+                    </div>
+
+                    <div class="terms-container">
+                        <div class="terms-checkbox">
+                            <input type="checkbox" id="terms" onchange="guardarDatosTemporales()">
+                            <label for="terms">Acepto los <a href="terminos.html" target="_blank">Términos y Condiciones</a> de MiTurnoPY.</label>
+                        </div>
+                        <div class="terms-checkbox">
+                            <input type="checkbox" id="privacy" onchange="guardarDatosTemporales()">
+                            <label for="privacy">Acepto la <a href="privacidad.html" target="_blank">Política de Privacidad</a> y el tratamiento seguro de mis datos.</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit-register">Continuar con la Activación</button>
+                </form>
+            </div>
+
+            <!-- PASO 2: PERSONALIZÁ TU LOCAL Y SELECCIONÁ PLAN -->
+            <div id="viewStep2" style="display: none;">
+                <div class="register-header">
+                    <h1>Personalizá tu local</h1>
+                    <p>Elegí tu plan, configurá tu identidad y definí los horarios de atención de tu negocio.</p>
+                </div>
+
+                <div class="dynamic-steps">
+                    <div class="step-box">
+                        <div class="step-icon">✓</div>
+                        <div class="step-content">
+                            <h4>Paso 1</h4>
+                            <p>Datos de Cuenta Listos</p>
+                        </div>
+                    </div>
+                    <div class="step-box active">
+                        <div class="step-icon">2</div>
+                        <div class="step-content">
+                            <h4>Paso Actual</h4>
+                            <p>Plan y Configuración</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="localForm" onsubmit="finalizarRegistro(event)" novalidate>
+                    
+                    <!-- 3 Tarjetas de Planes -->
+                    <div class="setup-section-box">
+                        <div class="setup-section-title">1. Seleccioná tu Plan</div>
+                        <div class="setup-section-desc">Elegí la modalidad que mejor se adapte al tamaño de tu equipo.</div>
+
+                        <div class="plans-grid-selector">
+                            <!-- Emprendedor -->
+                            <div class="plan-option-card selected" id="cardPlanEmprendedor" onclick="seleccionarPlanCard('emprendedor')">
+                                <input type="radio" name="planSeleccionado" id="planEmprendedor" value="emprendedor" checked onchange="guardarDatosTemporales()">
+                                <div>
+                                    <div class="plan-option-title">Emprendedor</div>
+                                    <div class="plan-option-price">Gs. 85.000 <span style="font-size:0.75rem; color:var(--text-muted)">/mes</span></div>
+                                    <div class="plan-option-desc">Hasta 4 staff • 1 Sucursal</div>
+                                </div>
+                            </div>
+
+                            <!-- Estudio -->
+                            <div class="plan-option-card" id="cardPlanEstudio" onclick="seleccionarPlanCard('estudio')">
+                                <div class="plan-option-badge">Más elegido</div>
+                                <input type="radio" name="planSeleccionado" id="planEstudio" value="estudio" onchange="guardarDatosTemporales()">
+                                <div>
+                                    <div class="plan-option-title">Estudio</div>
+                                    <div class="plan-option-price">Gs. 185.000 <span style="font-size:0.75rem; color:var(--text-muted)">/mes</span></div>
+                                    <div class="plan-option-desc">Hasta 12 staff • 3 Sucursales</div>
+                                </div>
+                            </div>
+
+                            <!-- Franquicia -->
+                            <div class="plan-option-card" id="cardPlanFranquicia" onclick="seleccionarPlanCard('franquicia')">
+                                <input type="radio" name="planSeleccionado" id="planFranquicia" value="franquicia" onchange="guardarDatosTemporales()">
+                                <div>
+                                    <div class="plan-option-title">Franquicia</div>
+                                    <div class="plan-option-price">Gs. 385.000 <span style="font-size:0.75rem; color:var(--text-muted)">/mes</span></div>
+                                    <div class="plan-option-desc">Staff y Sucursales ilimitadas</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos Básicos -->
+                    <div class="setup-section-box">
+                        <div class="setup-section-title">2. Datos Básicos del Local</div>
+                        <div class="setup-section-desc">Ingresá el nombre comercial y la ubicación física de tu salón o negocio.</div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group half">
+                                <label>Nombre del Local</label>
+                                <input type="text" id="nombreLocal" placeholder="Ej: Centro Estética Total" oninput="guardarDatosTemporales()">
+                                <div class="custom-tooltip" id="tip-nombreLocal">⚠️ Completá este campo</div>
+                            </div>
+                            <div class="form-group half">
+                                <label>Dirección</label>
+                                <input type="text" id="direccionLocal" placeholder="Ej: Aviadores del Chaco 1234" oninput="guardarDatosTemporales()">
+                                <div class="custom-tooltip" id="tip-direccionLocal">⚠️ Completá este campo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ubicación de Google Maps -->
+                    <div class="setup-section-box">
+                        <div class="setup-section-title">Ubicación exacta (Google Maps)</div>
+                        <div class="setup-section-desc">Escribí la dirección, ciudad o coordenadas para visualizar el mapa correctamente.</div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Lugar, Dirección o Coordenadas</label>
+                            <input type="text" id="mapaUrl" placeholder="Ej: Encarnación, Paraguay o -25.2637, -57.5759" oninput="actualizarMapa(); guardarDatosTemporales();">
+                            
+                            <a id="mapLinkWrapper" href="https://maps.google.com/?q=Asuncion,+Paraguay" target="_blank" class="map-preview-wrapper" title="Abrir ubicación exacta en Google Maps">
+                                <iframe id="mapIframe" src="https://maps.google.com/maps?q=Asuncion,+Paraguay&output=embed" allowfullscreen="" loading="lazy"></iframe>
+                                <div class="map-overlay-badge">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                    Abrir en Google Maps
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Redes Sociales y WhatsApp -->
+                    <div class="setup-section-box">
+                        <div class="setup-section-title">Redes Sociales y Contacto</div>
+                        <div class="setup-section-desc">Escribí tu número o usuario; al hacer clic en el icono se abrirá directamente el enlace correspondiente.</div>
+
+                        <div class="form-grid">
+                            <!-- WhatsApp -->
+                            <div class="form-group half">
+                                <label>WhatsApp</label>
+                                <div class="whatsapp-wrapper-clean">
+                                    <a href="#" id="linkWhatsapp" target="_blank" class="social-icon-btn-fixed" title="Abrir WhatsApp" style="color: #25d366;">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.116.556 4.103 1.528 5.825L.5 24l6.357-1.002C8.49 23.826 10.198 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882c-1.677 0-3.251-.452-4.605-1.238l-.33-.195-3.447.544.55-3.355-.213-.342C2.793 15.651 2.223 13.905 2.223 12c0-5.394 4.393-9.787 9.777-9.787 5.393 0 9.787 4.394 9.787 9.787 0 5.394-4.394 9.787-9.787 9.787z"/></svg>
+                                    </a>
+                                    <div class="whatsapp-input-group">
+                                        <span class="whatsapp-prefix">+595</span>
+                                        <input type="tel" id="whatsappLocal" placeholder="981 123456" oninput="actualizarRedesSociales(); guardarDatosTemporales();" style="border:none; background:transparent;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Instagram -->
+                            <div class="form-group half">
+                                <label>Instagram</label>
+                                <div class="social-input-wrapper">
+                                    <a href="#" id="linkInstagram" target="_blank" class="social-icon-link" title="Abrir Instagram" style="color: #e1306c;">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                                    </a>
+                                    <input type="text" id="instagramLocal" placeholder="@tu_negocio" oninput="actualizarRedesSociales(); guardarDatosTemporales();">
+                                </div>
+                            </div>
+
+                            <!-- Facebook -->
+                            <div class="form-group half">
+                                <label>Facebook</label>
+                                <div class="social-input-wrapper">
+                                    <a href="#" id="linkFacebook" target="_blank" class="social-icon-link" title="Abrir Facebook" style="color: #1877f2;">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.37 14.5 5 15.5 5H18V0h-3.808C10.59 0 9 1.581 9 4.615V8z"/></svg>
+                                    </a>
+                                    <input type="text" id="facebookLocal" placeholder="nombre.negocio" oninput="actualizarRedesSociales(); guardarDatosTemporales();">
+                                </div>
+                            </div>
+
+                            <!-- TikTok -->
+                            <div class="form-group half">
+                                <label>TikTok</label>
+                                <div class="social-input-wrapper">
+                                    <a href="#" id="linkTiktok" target="_blank" class="social-icon-link" title="Abrir TikTok" style="color: #ff0050;">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                                    </a>
+                                    <input type="text" id="tiktokLocal" placeholder="@tu_negocio" oninput="actualizarRedesSociales(); guardarDatosTemporales();">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horarios de Atención -->
+                    <div class="setup-section-box">
+                        <div class="setup-section-title">Horarios de Atención</div>
+                        <div class="setup-section-desc">Seleccioná los días laborables y configurá la franja horaria de apertura y cierre en formato militar (00 a 23).</div>
+
+                        <div id="scheduleContainer">
+                            <!-- Lunes a Sábado generado por JS -->
+                        </div>
+                    </div>
+
+                    <!-- Logotipo y Banner -->
+                    <div class="setup-section-box">
+                        <div class="setup-section-title">Identidad Visual</div>
+                        <div class="setup-section-desc">Subí el logotipo y la portada de tu salón para que tus clientes las reconozcan al agendar.</div>
+
+                        <!-- Banner -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display:block; font-weight:700; font-size:0.85rem; margin-bottom:8px;">Banner de Portada</label>
+                            <div class="banner-preview-box" id="bannerPreviewContainer">
+                                <span id="bannerPlaceholderText">Vista previa del banner (Recomendado 1200x400px)</span>
+                                <img id="bannerImgTag" src="" alt="Banner" style="display:none; width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <div class="file-upload-btn-wrapper">
+                                <label class="btn-file-custom">
+                                    Subir Banner <input type="file" id="inputBannerFile" accept="image/*" onchange="cargarImagen(event, 'banner')" style="display:none;">
+                                </label>
+                                <button type="button" class="btn-file-delete" id="btnDeleteBanner" onclick="eliminarImagen('banner')">Eliminar</button>
+                                <span class="file-name-label" id="nameBannerFile">Ningún archivo seleccionado</span>
+                            </div>
+                        </div>
+
+                        <!-- Logo -->
+                        <div>
+                            <label style="display:block; font-weight:700; font-size:0.85rem; margin-bottom:8px;">Logotipo del Local</label>
+                            <div class="upload-grid">
+                                <div class="logo-preview-box" id="logoPreviewContainer">
+                                    <span id="logoPlaceholderText">Sin Logo</span>
+                                    <img id="logoImgTag" src="" alt="Logo" style="display:none; width:100%; height:100%; object-fit:cover;">
+                                </div>
+                                <div style="display: flex; flex-direction: column; justify-content: center; gap: 10px;">
+                                    <div class="file-upload-btn-wrapper">
+                                        <label class="btn-file-custom">
+                                            Subir Logotipo <input type="file" id="inputLogoFile" accept="image/*" onchange="cargarImagen(event, 'logo')" style="display:none;">
+                                        </label>
+                                        <button type="button" class="btn-file-delete" id="btnDeleteLogo" onclick="eliminarImagen('logo')">Eliminar</button>
+                                    </div>
+                                    <span class="file-name-label" id="nameLogoFile">Ningún archivo seleccionado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit-register">Activar mi Local y Comenzar</button>
+                    <button type="button" class="btn-back-step" onclick="volverAlPaso1()">
+                        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                        Volver al Paso Anterior
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal de Alerta Estilo MiTurnoPY -->
+    <div class="modal-overlay" id="customAlertModal">
+        <div class="success-modal-card">
+            <div class="success-icon-wrapper" style="background: #fff1f2; color: #b8004f;">
+                <svg viewBox="0 0 24 24" style="width:28px; height:28px;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </div>
+            <h3 class="success-modal-title" id="alertModalTitle">Atención</h3>
+            <p class="success-modal-desc" id="alertModalDesc">Mensaje de alerta...</p>
+            <button type="button" class="success-modal-btn" onclick="cerrarAlertaModal()">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito Superior -->
+    <div class="modal-overlay" id="successModal">
+        <div class="success-modal-card">
+            <div class="success-icon-wrapper">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h3 class="success-modal-title">¡Local Registrado con Éxito!</h3>
+            <p class="success-modal-desc">Tu prueba gratuita de 15 días ha comenzado. Ya podés acceder a tu panel de control para empezar a gestionar tus turnos y profesionales.</p>
+            <button type="button" class="success-modal-btn" onclick="irAlDashboard()">Ir a mi Panel de Control</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+                    <span>MiTurnoPY</span>
+                </div>
+                <p>La plataforma líder en gestión de turnos y agenda digital para salones, barberías y centros de estética en Paraguay.</p>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-col">
+                    <h4>Navegación</h4>
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="login.html">Iniciar Sesión</a></li>
+                        <li><a href="register.html">Registrarse</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Soporte</h4>
+                    <ul>
+                        <li><a href="contacto.html">Ayuda y FAQ</a></li>
+                        <li><a href="mailto:soportemiturnopy@gmail.com">soportemiturnopy@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-legal-links">
+                <a href="terminos.html">Términos y Condiciones</a> • 
+                <a href="privacidad.html">Política de Privacidad</a> • 
+                <a href="#">Aviso Legal</a>
+            </div>
+            <p>&copy; 2026 MiTurnoPY. Todos los derechos reservados • Encarnación, Paraguay</p>
+        </div>
+    </footer>
+
+    <!-- Script de Temas y Lógica del Formulario -->
+    <script>
+        const body = document.body;
+        const iconContainer = document.getElementById('themeIconContainer');
+        const textSpan = document.getElementById('themeText');
+        let currentMode = localStorage.getItem('miturnopy_theme') || 'light';
+
+        const svgs = {
+            light: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+            dark: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            system: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+        };
+
+        function applyTheme(mode) {
+            currentMode = mode;
+            localStorage.setItem('miturnopy_theme', mode);
+            if (mode === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.system;
+                if(textSpan) textSpan.textContent = 'Sistema';
+            } else if (mode === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                if(iconContainer) iconContainer.innerHTML = svgs.dark;
+                if(textSpan) textSpan.textContent = 'Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                if(iconContainer) iconContainer.innerHTML = svgs.light;
+                if(textSpan) textSpan.textContent = 'Claro';
+            }
+        }
+
+        function cycleTheme() {
+            if (currentMode === 'light') applyTheme('dark');
+            else if (currentMode === 'dark') applyTheme('system');
+            else applyTheme('light');
+        }
+
+        applyTheme(currentMode);
+
+        function mostrarAlertaPersonalizada(titulo, mensaje) {
+            document.getElementById('alertModalTitle').textContent = titulo;
+            document.getElementById('alertModalDesc').textContent = mensaje;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('customAlertModal').classList.add('active');
+        }
+
+        function cerrarAlertaModal() {
+            document.getElementById('customAlertModal').classList.remove('active');
+        }
+
+        // Generar Horarios de Atención (Formato militar 00 a 23)
+        const diasSemana = [
+            { id: 'lun', nombre: 'Lunes', abierto: true, ap: '08:00', ci: '19:00' },
+            { id: 'mar', nombre: 'Martes', abierto: true, ap: '08:00', ci: '19:00' },
+            { id: 'mie', nombre: 'Miércoles', abierto: true, ap: '08:00', ci: '19:00' },
+            { id: 'jue', nombre: 'Jueves', abierto: true, ap: '08:00', ci: '19:00' },
+            { id: 'vie', nombre: 'Viernes', abierto: true, ap: '08:00', ci: '19:00' },
+            { id: 'sab', nombre: 'Sábado', abierto: true, ap: '08:00', ci: '17:00' },
+            { id: 'dom', nombre: 'Domingo', abierto: false, ap: '00:00', ci: '23:00' }
+        ];
+
+        function renderizarHorarios() {
+            const container = document.getElementById('scheduleContainer');
+            container.innerHTML = '';
+            diasSemana.forEach(d => {
+                container.innerHTML += `
+                    <div class="schedule-simple-row">
+                        <label class="schedule-simple-left">
+                            <input type="checkbox" id="check_${d.id}" ${d.abierto ? 'checked' : ''} onchange="toggleDiaHorario('${d.id}')">
+                            ${d.nombre}
+                        </label>
+                        <div id="inputs_${d.id}" class="schedule-simple-inputs" style="display: ${d.abierto ? 'flex' : 'none'};">
+                            <span>Apertura:</span>
+                            <input type="time" id="ap_${d.id}" value="${d.ap}" min="00:00" max="23:59" onchange="guardarDatosTemporales()">
+                            <span>Cierre:</span>
+                            <input type="time" id="ci_${d.id}" value="${d.ci}" min="00:00" max="23:59" onchange="guardarDatosTemporales()">
+                        </div>
+                        <div id="closed_${d.id}" class="schedule-closed-badge" style="display: ${d.abierto ? 'none' : 'block'};">
+                            Cerrado (Día libre)
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleDiaHorario(id) {
+            const isChecked = document.getElementById(`check_${id}`).checked;
+            document.getElementById(`inputs_${id}`).style.display = isChecked ? 'flex' : 'none';
+            document.getElementById(`closed_${id}`).style.display = isChecked ? 'none' : 'block';
+            guardarDatosTemporales();
+        }
+
+        renderizarHorarios();
+
+        function seleccionarPlanCard(tipo) {
+            document.querySelectorAll('.plan-option-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(`cardPlan${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).classList.add('selected');
+            document.getElementById(`plan${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).checked = true;
+            guardarDatosTemporales();
+        }
+
+        function actualizarMapa() {
+            const val = document.getElementById('mapaUrl').value.trim();
+            const query = val !== '' ? encodeURIComponent(val) : 'Asuncion, Paraguay';
+            document.getElementById('mapIframe').src = `https://maps.google.com/maps?q=${query}&output=embed`;
+            document.getElementById('mapLinkWrapper').href = `https://maps.google.com/?q=${query}`;
+        }
+
+        function actualizarRedesSociales() {
+            const wapp = document.getElementById('whatsappLocal').value.trim();
+            const ig = document.getElementById('instagramLocal').value.trim();
+            const fb = document.getElementById('facebookLocal').value.trim();
+            const tk = document.getElementById('tiktokLocal').value.trim();
+
+            document.getElementById('linkWhatsapp').href = wapp ? `https://wa.me/595${wapp.replace(/\s+/g, '')}` : '#';
+            document.getElementById('linkInstagram').href = ig ? `https://instagram.com/${ig.replace('@', '')}` : '#';
+            document.getElementById('linkFacebook').href = fb ? `https://facebook.com/${fb}` : '#';
+            document.getElementById('linkTiktok').href = tk ? `https://tiktok.com/@${tk.replace('@', '')}` : '#';
+        }
+
+        function togglePasswordVisibility(fieldId, iconId) {
+            const input = document.getElementById(fieldId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.style.fill = 'var(--primary-color)';
+            } else {
+                input.type = 'password';
+                icon.style.fill = 'currentColor';
+            }
+        }
+
+        function cargarImagen(event, tipo) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (tipo === 'logo') {
+                    document.getElementById('logoImgTag').src = e.target.result;
+                    document.getElementById('logoImgTag').style.display = 'block';
+                    document.getElementById('logoPlaceholderText').style.display = 'none';
+                    document.getElementById('btnDeleteLogo').style.display = 'inline-block';
+                    document.getElementById('nameLogoFile').textContent = file.name;
+                } else {
+                    document.getElementById('bannerImgTag').src = e.target.result;
+                    document.getElementById('bannerImgTag').style.display = 'block';
+                    document.getElementById('bannerPlaceholderText').style.display = 'none';
+                    document.getElementById('btnDeleteBanner').style.display = 'inline-block';
+                    document.getElementById('nameBannerFile').textContent = file.name;
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function eliminarImagen(tipo) {
+            if (tipo === 'logo') {
+                document.getElementById('inputLogoFile').value = '';
+                document.getElementById('logoImgTag').src = '';
+                document.getElementById('logoImgTag').style.display = 'none';
+                document.getElementById('logoPlaceholderText').style.display = 'block';
+                document.getElementById('btnDeleteLogo').style.display = 'none';
+                document.getElementById('nameLogoFile').textContent = 'Ningún archivo seleccionado';
+            } else {
+                document.getElementById('inputBannerFile').value = '';
+                document.getElementById('bannerImgTag').src = '';
+                document.getElementById('bannerImgTag').style.display = 'none';
+                document.getElementById('bannerPlaceholderText').style.display = 'block';
+                document.getElementById('btnDeleteBanner').style.display = 'none';
+                document.getElementById('nameBannerFile').textContent = 'Ningún archivo seleccionado';
+            }
+        }
+
+        function guardarDatosTemporales() {}
+
+        function avanzarAlPaso2(e) {
+            e.preventDefault();
+            const campos = ['nombreCompleto', 'correo', 'telefono', 'cedula', 'password', 'confirmPassword'];
+            let valido = true;
+
+            campos.forEach(id => {
+                const el = document.getElementById(id);
+                const tip = document.getElementById(`tip-${id}`);
+                if (!el.value.trim()) {
+                    el.style.borderColor = '#ef4444';
+                    if(tip) tip.style.display = 'flex';
+                    valido = false;
+                } else {
+                    el.style.borderColor = 'var(--card-border)';
+                    if(tip) tip.style.display = 'none';
+                }
+            });
+
+            if (!valido) return;
+
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            
+            const tieneMinLength = pass.length >= 8;
+            const tieneMayuscula = /[A-Z]/.test(pass);
+            const tieneMinuscula = /[a-z]/.test(pass);
+
+            if (!tieneMinLength || !tieneMayuscula || !tieneMinuscula) {
+                document.getElementById('password').style.borderColor = '#ef4444';
+                mostrarAlertaPersonalizada(
+                    "Contraseña Segura Requerida", 
+                    "La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula y una letra minúscula para continuar."
+                );
+                return;
+            } else {
+                document.getElementById('password').style.borderColor = 'var(--card-border)';
+            }
+
+            if (pass !== confirmPass) {
+                document.getElementById('confirmPassword').style.borderColor = '#ef4444';
+                mostrarAlertaPersonalizada("Contraseñas Divergentes", "Las contraseñas ingresadas no coinciden. Por favor, verificá los datos.");
+                return;
+            } else {
+                document.getElementById('confirmPassword').style.borderColor = 'var(--card-border)';
+            }
+
+            const terms = document.getElementById('terms').checked;
+            const privacy = document.getElementById('privacy').checked;
+            if (!terms || !privacy) {
+                mostrarAlertaPersonalizada(
+                    "Aceptación Obligatoria", 
+                    "Debes aceptar los Términos y Condiciones y la Política de Privacidad de MiTurnoPY para poder avanzar."
+                );
+                return;
+            }
+
+            document.getElementById('viewStep1').style.display = 'none';
+            document.getElementById('viewStep2').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function volverAlPaso1() {
+            document.getElementById('viewStep2').style.display = 'none';
+            document.getElementById('viewStep1').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function finalizarRegistro(e) {
+            e.preventDefault();
+            const nombreLocal = document.getElementById('nombreLocal').value.trim();
+            const direccionLocal = document.getElementById('direccionLocal').value.trim();
+
+            if (!nombreLocal || !direccionLocal) {
+                mostrarAlertaPersonalizada("Campos Incompletos", "Por favor, completá el nombre del local y la dirección.");
+                if(!nombreLocal) document.getElementById('nombreLocal').style.borderColor = '#ef4444';
+                if(!direccionLocal) document.getElementById('direccionLocal').style.borderColor = '#ef4444';
+                return;
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function irAlDashboard() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
