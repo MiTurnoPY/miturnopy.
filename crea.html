@@ -541,7 +541,7 @@
 
         .plans-grid-selector {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 18px;
             margin-top: 15px;
         }
@@ -1217,7 +1217,7 @@
 
                 <form id="localForm" onsubmit="finalizarRegistro(event)" novalidate>
                     
-                    <!-- 3 Tarjetas de Planes -->
+                    <!-- 2 Tarjetas de Planes -->
                     <div class="setup-section-box">
                         <div class="setup-section-title">1. Seleccioná tu Plan</div>
                         <div class="setup-section-desc">Elegí la modalidad que mejor se adapte al tamaño de tu equipo.</div>
@@ -1241,16 +1241,6 @@
                                     <div class="plan-option-title">Estudio</div>
                                     <div class="plan-option-price">Gs. 185.000 <span style="font-size:0.75rem; color:var(--text-muted)">/mes</span></div>
                                     <div class="plan-option-desc">Hasta 12 staff • 3 Sucursales</div>
-                                </div>
-                            </div>
-
-                            <!-- Franquicia -->
-                            <div class="plan-option-card" id="cardPlanFranquicia" onclick="seleccionarPlanCard('franquicia')">
-                                <input type="radio" name="planSeleccionado" id="planFranquicia" value="franquicia" onchange="guardarDatosTemporales()">
-                                <div>
-                                    <div class="plan-option-title">Franquicia</div>
-                                    <div class="plan-option-price">Gs. 385.000 <span style="font-size:0.75rem; color:var(--text-muted)">/mes</span></div>
-                                    <div class="plan-option-desc">Staff y Sucursales ilimitadas</div>
                                 </div>
                             </div>
                         </div>
