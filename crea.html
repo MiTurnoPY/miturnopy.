@@ -1217,12 +1217,12 @@
 
                 <form id="localForm" onsubmit="finalizarRegistro(event)" novalidate>
                     
-                    <!-- 2 Tarjetas de Planes -->
+                    <!-- 2 Tarjetas de Planes (Emprendedor y Estudio) -->
                     <div class="setup-section-box">
                         <div class="setup-section-title">1. Seleccioná tu Plan</div>
                         <div class="setup-section-desc">Elegí la modalidad que mejor se adapte al tamaño de tu equipo.</div>
 
-                        <div class="plans-grid-selector">
+                        <div class="plans-grid-selector" style="grid-template-columns: repeat(2, 1fr);">
                             <!-- Emprendedor -->
                             <div class="plan-option-card selected" id="cardPlanEmprendedor" onclick="seleccionarPlanCard('emprendedor')">
                                 <input type="radio" name="planSeleccionado" id="planEmprendedor" value="emprendedor" checked onchange="guardarDatosTemporales()">
@@ -1463,7 +1463,7 @@
         </div>
     </footer>
 
-    <!-- Script de Temas y Lógica del Formulario -->
+    <!-- Script de Temas y Lógica del Formulario con localStorage -->
     <script>
         const body = document.body;
         const iconContainer = document.getElementById('themeIconContainer');
@@ -1636,7 +1636,100 @@
             }
         }
 
-        function guardarDatosTemporales() {}
+        function guardarDatosTemporales() {
+            const formData = {
+                nombreCompleto: document.getElementById('nombreCompleto')?.value || '',
+                correo: document.getElementById('correo')?.value || '',
+                countryCode: document.getElementById('countryCode')?.value || '+595',
+                telefono: document.getElementById('telefono')?.value || '',
+                cedula: document.getElementById('cedula')?.value || '',
+                password: document.getElementById('password')?.value || '',
+                confirmPassword: document.getElementById('confirmPassword')?.value || '',
+                terms: document.getElementById('terms')?.checked || false,
+                privacy: document.getElementById('privacy')?.checked || false,
+                plan: document.querySelector('input[name="planSeleccionado"]:checked')?.value || 'emprendedor',
+                nombreLocal: document.getElementById('nombreLocal')?.value || '',
+                direccionLocal: document.getElementById('direccionLocal')?.value || '',
+                mapaUrl: document.getElementById('mapaUrl')?.value || '',
+                whatsappLocal: document.getElementById('whatsappLocal')?.value || '',
+                instagramLocal: document.getElementById('instagramLocal')?.value || '',
+                facebookLocal: document.getElementById('facebookLocal')?.value || '',
+                tiktokLocal: document.getElementById('tiktokLocal')?.value || '',
+                currentStep: document.getElementById('viewStep2').style.display === 'block' ? 'step2' : 'step1'
+            };
+
+            const horariosState = {};
+            diasSemana.forEach(d => {
+                const chk = document.getElementById(`check_${d.id}`);
+                const ap = document.getElementById(`ap_${d.id}`);
+                const ci = document.getElementById(`ci_${d.id}`);
+                horariosState[d.id] = {
+                    abierto: chk ? chk.checked : d.abierto,
+                    ap: ap ? ap.value : d.ap,
+                    ci: ci ? ci.value : d.ci
+                };
+            });
+            formData.horarios = horariosState;
+
+            localStorage.setItem('miturnopy_registro_state', JSON.stringify(formData));
+        }
+
+        // Restaurar estado al recargar (manteniendo Paso 2 si ya estaba ahí)
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('miturnopy_registro_state');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.nombreCompleto) document.getElementById('nombreCompleto').value = data.nombreCompleto;
+                    if (data.correo) document.getElementById('correo').value = data.correo;
+                    if (data.countryCode) document.getElementById('countryCode').value = data.countryCode;
+                    if (data.telefono) document.getElementById('telefono').value = data.telefono;
+                    if (data.cedula) document.getElementById('cedula').value = data.cedula;
+                    if (data.password) document.getElementById('password').value = data.password;
+                    if (data.confirmPassword) document.getElementById('confirmPassword').value = data.confirmPassword;
+                    if (data.terms !== undefined) document.getElementById('terms').checked = data.terms;
+                    if (data.privacy !== undefined) document.getElementById('privacy').checked = data.privacy;
+                    
+                    if (data.plan) {
+                        seleccionarPlanCard(data.plan);
+                    }
+
+                    if (data.nombreLocal) document.getElementById('nombreLocal').value = data.nombreLocal;
+                    if (data.direccionLocal) document.getElementById('direccionLocal').value = data.direccionLocal;
+                    if (data.mapaUrl) {
+                        document.getElementById('mapaUrl').value = data.mapaUrl;
+                        actualizarMapa();
+                    }
+                    if (data.whatsappLocal) document.getElementById('whatsappLocal').value = data.whatsappLocal;
+                    if (data.instagramLocal) document.getElementById('instagramLocal').value = data.instagramLocal;
+                    if (data.facebookLocal) document.getElementById('facebookLocal').value = data.facebookLocal;
+                    if (data.tiktokLocal) document.getElementById('tiktokLocal').value = data.tiktokLocal;
+                    actualizarRedesSociales();
+
+                    if (data.horarios) {
+                        diasSemana.forEach(d => {
+                            if (data.horarios[d.id]) {
+                                const h = data.horarios[d.id];
+                                const chk = document.getElementById(`check_${d.id}`);
+                                const ap = document.getElementById(`ap_${d.id}`);
+                                const ci = document.getElementById(`ci_${d.id}`);
+                                if (chk) chk.checked = h.abierto;
+                                if (ap) ap.value = h.ap;
+                                if (ci) ci.value = h.ci;
+                                toggleDiaHorario(d.id);
+                            }
+                        });
+                    }
+
+                    if (data.currentStep === 'step2') {
+                        document.getElementById('viewStep1').style.display = 'none';
+                        document.getElementById('viewStep2').style.display = 'block';
+                    }
+                } catch (e) {
+                    console.error("Error restaurando estado", e);
+                }
+            }
+        });
 
         function avanzarAlPaso2(e) {
             e.preventDefault();
@@ -1696,12 +1789,14 @@
 
             document.getElementById('viewStep1').style.display = 'none';
             document.getElementById('viewStep2').style.display = 'block';
+            guardarDatosTemporales();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function volverAlPaso1() {
             document.getElementById('viewStep2').style.display = 'none';
             document.getElementById('viewStep1').style.display = 'block';
+            guardarDatosTemporales();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1717,6 +1812,8 @@
                 return;
             }
 
+            // Limpiar datos temporales solo al completar con éxito
+            localStorage.removeItem('miturnopy_registro_state');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('successModal').classList.add('active');
         }
