@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MiTurnoPY - Registrar y Configurar Local</title>
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary-color: #b8004f;
@@ -1463,8 +1465,16 @@
         </div>
     </footer>
 
-    <!-- Script de Temas y Lógica del Formulario con localStorage -->
+    <!-- Script de Temas y Lógica de Supabase y Formulario -->
     <script>
+        // ==========================================
+        // CONFIGURACIÓN DE SUPABASE
+        // ==========================================
+        const SUPABASE_URL = 'https://astunocktydyecguufqw.supabase.co'; // Tu URL de Supabase obtenida del panel
+        const SUPABASE_ANON_KEY = 'TU_ANON_KEY_AQUI'; // Reemplaza con tu clave anon pública real de Supabase
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const body = document.body;
         const iconContainer = document.getElementById('themeIconContainer');
         const textSpan = document.getElementById('themeText');
@@ -1614,6 +1624,7 @@
                     document.getElementById('btnDeleteBanner').style.display = 'inline-block';
                     document.getElementById('nameBannerFile').textContent = file.name;
                 }
+                guardarDatosTemporales();
             }
             reader.readAsDataURL(file);
         }
@@ -1634,6 +1645,7 @@
                 document.getElementById('btnDeleteBanner').style.display = 'none';
                 document.getElementById('nameBannerFile').textContent = 'Ningún archivo seleccionado';
             }
+            guardarDatosTemporales();
         }
 
         function guardarDatosTemporales() {
@@ -1655,6 +1667,8 @@
                 instagramLocal: document.getElementById('instagramLocal')?.value || '',
                 facebookLocal: document.getElementById('facebookLocal')?.value || '',
                 tiktokLocal: document.getElementById('tiktokLocal')?.value || '',
+                logo_url: document.getElementById('logoImgTag')?.src || '',
+                banner_url: document.getElementById('bannerImgTag')?.src || '',
                 currentStep: document.getElementById('viewStep2').style.display === 'block' ? 'step2' : 'step1'
             };
 
@@ -1674,7 +1688,7 @@
             localStorage.setItem('miturnopy_registro_state', JSON.stringify(formData));
         }
 
-        // Restaurar estado al recargar (manteniendo Paso 2 si ya estaba ahí)
+        // Restaurar estado al recargar
         window.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('miturnopy_registro_state');
             if (saved) {
@@ -1705,6 +1719,20 @@
                     if (data.facebookLocal) document.getElementById('facebookLocal').value = data.facebookLocal;
                     if (data.tiktokLocal) document.getElementById('tiktokLocal').value = data.tiktokLocal;
                     actualizarRedesSociales();
+
+                    if (data.logo_url && data.logo_url.startsWith('data:image')) {
+                        document.getElementById('logoImgTag').src = data.logo_url;
+                        document.getElementById('logoImgTag').style.display = 'block';
+                        document.getElementById('logoPlaceholderText').style.display = 'none';
+                        document.getElementById('btnDeleteLogo').style.display = 'inline-block';
+                    }
+
+                    if (data.banner_url && data.banner_url.startsWith('data:image')) {
+                        document.getElementById('bannerImgTag').src = data.banner_url;
+                        document.getElementById('bannerImgTag').style.display = 'block';
+                        document.getElementById('bannerPlaceholderText').style.display = 'none';
+                        document.getElementById('btnDeleteBanner').style.display = 'inline-block';
+                    }
 
                     if (data.horarios) {
                         diasSemana.forEach(d => {
@@ -1800,7 +1828,10 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function finalizarRegistro(e) {
+        // ==========================================
+        // GUARDAR REGISTRO EN SUPABASE
+        // ==========================================
+        async function finalizarRegistro(e) {
             e.preventDefault();
             const nombreLocal = document.getElementById('nombreLocal').value.trim();
             const direccionLocal = document.getElementById('direccionLocal').value.trim();
@@ -1809,6 +1840,50 @@
                 mostrarAlertaPersonalizada("Campos Incompletos", "Por favor, completá el nombre del local y la dirección.");
                 if(!nombreLocal) document.getElementById('nombreLocal').style.borderColor = '#ef4444';
                 if(!direccionLocal) document.getElementById('direccionLocal').style.borderColor = '#ef4444';
+                return;
+            }
+
+            // Recopilar todos los datos del formulario temporal y de los inputs
+            const savedState = JSON.parse(localStorage.getItem('miturnopy_registro_state') || '{}');
+            
+            // Recopilar horarios actuales
+            const horariosObj = {};
+            diasSemana.forEach(d => {
+                const chk = document.getElementById(`check_${d.id}`);
+                const ap = document.getElementById(`ap_${d.id}`);
+                const ci = document.getElementById(`ci_${d.id}`);
+                horariosObj[d.id] = {
+                    abierto: chk ? chk.checked : d.abierto,
+                    ap: ap ? ap.value : d.ap,
+                    ci: ci ? ci.value : d.ci
+                };
+            });
+
+            const datosNegocio = {
+                nombre_operador: savedState.nombreCompleto || '',
+                correo: savedState.correo || '',
+                telefono: (savedState.countryCode || '+595') + ' ' + (savedState.telefono || ''),
+                cedula: savedState.cedula || '',
+                plan: document.querySelector('input[name="planSeleccionado"]:checked')?.value || 'emprendedor',
+                nombre_local: nombreLocal,
+                direccion_local: direccionLocal,
+                mapa_url: document.getElementById('mapaUrl').value.trim(),
+                whatsapp_local: document.getElementById('whatsappLocal').value.trim(),
+                instagram_local: document.getElementById('instagramLocal').value.trim(),
+                facebook_local: document.getElementById('facebookLocal').value.trim(),
+                tiktok_local: document.getElementById('tiktokLocal').value.trim(),
+                horarios: JSON.stringify(horariosObj),
+                logo_url: document.getElementById('logoImgTag').src.startsWith('data:image') ? document.getElementById('logoImgTag').src : '',
+                banner_url: document.getElementById('bannerImgTag').src.startsWith('data:image') ? document.getElementById('bannerImgTag').src : ''
+            };
+
+            // Enviar a Supabase
+            const { data, error } = await supabaseClient
+                .from('businesses')
+                .insert([datosNegocio]);
+
+            if (error) {
+                mostrarAlertaPersonalizada("Error de Registro", "Hubo un error al guardar en la base de datos: " + error.message);
                 return;
             }
 
