@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - MiTurnoPY</title>
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary-color: #b8004f;
@@ -722,13 +724,34 @@
         </div>
     </div>
 
+    <!-- Modal de Éxito de Inicio de Sesión -->
+    <div class="modal-overlay" id="successModal">
+        <div class="success-modal-card">
+            <div class="success-icon-wrapper" style="color: #b8004f;">
+                <svg viewBox="0 0 24 24" style="width:32px; height:32px; stroke:currentColor; stroke-width:3; fill:none; stroke-linecap:round; stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h3 class="success-modal-title">¡Bienvenido de nuevo!</h3>
+            <p class="success-modal-desc" id="successModalDesc">Has iniciado sesión correctamente en tu cuenta de MiTurnoPY.</p>
+            <button type="button" class="success-modal-btn" onclick="irAlDashboard()">Ir a la plataforma</button>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-content">
             <p>&copy; 2026 MiTurnoPY. Todos los derechos reservados • Encarnación, Paraguay</p>
         </div>
     </footer>
 
+    <!-- Lógica de Supabase y Control de Sesión -->
     <script>
+        // ==========================================
+        // CONFIGURACIÓN DE SUPABASE
+        // ==========================================
+        const SUPABASE_URL = 'https://astunocktydyecguufqw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Wbc3Zw3xqFC-8Pgu1ZnRmQ_Z9mXQXxz';
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         document.addEventListener("DOMContentLoaded", () => {
             const links = document.querySelectorAll("a");
 
@@ -860,18 +883,22 @@
             document.getElementById('stepRecuperacion').classList.remove('active');
             document.getElementById('stepLogin').classList.add('active');
         }
+
+        function irAlDashboard() {
+            window.location.href = 'index.html';
+        }
     </script>
 
-    <!-- Lógica de Inicio de Sesión y Recuperación Dual -->
+    <!-- Lógica de Validación Inteligente con Supabase -->
     <script>
         function loginSocial(provider) {
             mostrarAlertaPersonalizada("Acceso Social", "La conexión con " + provider + " estará disponible cuando publiquemos la web en Vercel.");
         }
 
-        function manejarLogin(e) {
+        async function manejarLogin(e) {
             e.preventDefault();
             const emailInput = document.getElementById('loginEmail').value.trim();
-            const passwordInput = document.getElementById('loginPassword').value.trim();
+            const passwordInput = document.getElementById('loginPassword').value;
 
             let valido = true;
 
@@ -909,10 +936,49 @@
                 return;
             }
 
-            mostrarAlertaPersonalizada("¡Bienvenido!", "Has iniciado sesión correctamente en MiTurnoPY.");
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
+            try {
+                // 1. Buscar en la tabla de Negocios (businesses)
+                const { data: businessData, error: businessError } = await supabaseClient
+                    .from('businesses')
+                    .select('*')
+                    .eq('correo', emailInput)
+                    .maybeSingle();
+
+                if (businessData) {
+                    if (businessData.password && businessData.password === passwordInput) {
+                        localStorage.setItem('miturnopy_usuario_activo', JSON.stringify({ tipo: 'negocio', nombre: businessData.nombre_local, correo: emailInput }));
+                        document.getElementById('successModalDesc').textContent = `¡Bienvenido de nuevo, ${businessData.nombre_operador || 'Dueño'}! Has accedido a la gestión de ${businessData.nombre_local}.`;
+                        document.getElementById('successModal').classList.add('active');
+                        return;
+                    }
+                }
+
+                // 2. Buscar en la tabla de Clientes (clients)
+                const { data: clientData, error: clientError } = await supabaseClient
+                    .from('clients')
+                    .select('*')
+                    .eq('correo', emailInput)
+                    .maybeSingle();
+
+                if (clientData) {
+                    if (clientData.password && clientData.password === passwordInput) {
+                        localStorage.setItem('miturnopy_usuario_activo', JSON.stringify({ tipo: 'cliente', nombre: clientData.nombre_apellido, correo: emailInput }));
+                        document.getElementById('successModalDesc').textContent = `¡Hola de nuevo, ${clientData.nombre_apellido}! Ya podés buscar profesionales y gestionar tus turnos.`;
+                        document.getElementById('successModal').classList.add('active');
+                        return;
+                    }
+                }
+
+                // 3. Si no existe en ninguna o la contraseña no coincide
+                mostrarAlertaPersonalizada(
+                    "Cuenta no encontrada o datos incorrectos", 
+                    "No encontramos ninguna cuenta registrada con este correo electrónico o la contraseña es incorrecta. Si aún no te registraste, hacelo en la sección de registro."
+                );
+
+            } catch (err) {
+                console.error("Error en login:", err);
+                mostrarAlertaPersonalizada("Error de Conexión", "Ocurrió un problema al verificar tus datos con la base de datos. Inténtalo de nuevo.");
+            }
         }
 
         function manejarRecuperacion(e) {
@@ -952,7 +1018,6 @@
                     return;
                 }
 
-                // Validación simple de número telefónico (mínimo 8 dígitos)
                 const phoneRegex = /^[0-9+\s()-]{8,15}$/;
                 if (!phoneRegex.test(phoneInput)) {
                     phoneEl.style.borderColor = '#ef4444';
