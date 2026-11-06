@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - MiTurnoPY</title>
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary-color: #b8004f;
@@ -856,8 +858,16 @@
         });
     </script>
 
-    <!-- Sincronización robusta de Temas y Lógica de Registro Local -->
+    <!-- Sincronización robusta de Temas y Conexión con Supabase -->
     <script>
+        // ==========================================
+        // CONFIGURACIÓN DE SUPABASE (CLIENTES)
+        // ==========================================
+        const SUPABASE_URL = 'https://astunocktydyecguufqw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Wbc3Zw3xqFC-8Pgu1ZnRmQ_Z9mXQXxz';
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         const body = document.body;
         const iconContainer = document.getElementById('themeIconContainer');
         const textSpan = document.getElementById('themeText');
@@ -949,7 +959,10 @@
             mostrarAlertaPersonalizada("Acceso Social", "La conexión con " + provider + " estará disponible cuando publiquemos la web en Vercel.");
         }
 
-        function manejarRegistroCliente(e) {
+        // ==========================================
+        // GUARDAR REGISTRO DE CLIENTE EN SUPABASE
+        // ==========================================
+        async function manejarRegistroCliente(e) {
             e.preventDefault();
             const campos = ['cliNombre', 'cliEmail', 'cliPassword', 'cliPasswordConfirm'];
             let valido = true;
@@ -969,6 +982,7 @@
 
             if (!valido) return;
 
+            const nombre = document.getElementById('cliNombre').value.trim();
             const email = document.getElementById('cliEmail').value.trim();
             const password = document.getElementById('cliPassword').value;
             const passwordConfirm = document.getElementById('cliPasswordConfirm').value;
@@ -1014,7 +1028,24 @@
                 return;
             }
 
-            // Éxito: Muestra el modal estilizado sin depender de servidores externos
+            // Empaquetar los datos para la tabla clients de Supabase
+            const datosCliente = {
+                nombre_apellido: nombre,
+                correo: email,
+                password: password
+            };
+
+            // Enviar los datos a la tabla `clients` en Supabase
+            const { data, error } = await supabaseClient
+                .from('clients')
+                .insert([datosCliente]);
+
+            if (error) {
+                mostrarAlertaPersonalizada("Error de Registro", "Hubo un error al registrar el cliente: " + error.message);
+                return;
+            }
+
+            // Éxito: Muestra el modal estilizado y guarda el registro limpiamente
             window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('successModal').classList.add('active');
         }
