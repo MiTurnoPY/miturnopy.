@@ -1859,11 +1859,13 @@
                 };
             });
 
+            const correoOperador = savedState.correo || document.getElementById('correo')?.value.trim() || '';
+
             const datosNegocio = {
-                nombre_operador: savedState.nombreCompleto || '',
-                correo: savedState.correo || '',
-                telefono: (savedState.countryCode || '+595') + ' ' + (savedState.telefono || ''),
-                cedula: savedState.cedula || '',
+                nombre_operador: savedState.nombreCompleto || document.getElementById('nombreCompleto')?.value.trim() || '',
+                correo: correoOperador,
+                telefono: (savedState.countryCode || '+595') + ' ' + (savedState.telefono || document.getElementById('telefono')?.value.trim() || ''),
+                cedula: savedState.cedula || document.getElementById('cedula')?.value.trim() || '',
                 plan: document.querySelector('input[name="planSeleccionado"]:checked')?.value || 'emprendedor',
                 nombre_local: nombreLocal,
                 direccion_local: direccionLocal,
@@ -1887,6 +1889,13 @@
                 return;
             }
 
+            // Guardar sesión activa del negocio para que el panel lo cargue directo
+            localStorage.setItem('miturnopy_usuario_activo', JSON.stringify({
+                tipo: 'negocio',
+                nombre: nombreLocal,
+                correo: correoOperador
+            }));
+
             // Limpiar datos temporales solo al completar con éxito
             localStorage.removeItem('miturnopy_registro_state');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1894,7 +1903,7 @@
         }
 
         function irAlDashboard() {
-            window.location.href = 'index.html';
+            window.location.href = 'panel-negocio.html';
         }
     </script>
 </body>
