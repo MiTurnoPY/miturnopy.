@@ -370,7 +370,6 @@
             font-size: 0.9rem;
         }
 
-        /* Modal Estilo MiTurnoPY */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -461,8 +460,8 @@
     <main class="dashboard-wrapper" id="dashboardContent">
         <section class="panel-header">
             <div>
-                <span class="badge-rubro" id="negocioRubro">Negocio Registrado</span>
-                <h1 id="negocioNombre">Cargando local...</h1>
+                <span class="badge-rubro" id="negocioPlan">Plan Emprendedor • 15 Días Gratis</span>
+                <h1 id="negocioNombre">Mi Local</h1>
                 <p id="negocioSubtitulo">Operador: — • Correo: —</p>
             </div>
             <div>
@@ -482,8 +481,8 @@
                 <div class="stat-value" style="font-size: 1.25rem;">Activo</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Plataforma</div>
-                <div class="stat-value" style="font-size: 1.25rem;">MiTurnoPY</div>
+                <div class="stat-label">Dirección</div>
+                <div class="stat-value" id="statDireccion" style="font-size: 1.05rem;">Paraguay</div>
             </div>
         </section>
 
@@ -516,12 +515,12 @@
         </section>
     </main>
 
-    <!-- Modal de Bloqueo / Aviso -->
+    <!-- Modal de Bloqueo -->
     <div class="modal-overlay" id="accessModal">
         <div class="modal-card">
             <h3 class="modal-title" id="accessModalTitle">Acceso restringido</h3>
-            <p class="modal-desc" id="accessModalDesc">Debes iniciar sesión con una cuenta de negocio registrada para acceder a este panel.</p>
-            <button type="button" class="btn-primary" id="accessModalBtn" onclick="redirigirLogin()">Ir a iniciar sesión</button>
+            <p class="modal-desc" id="accessModalDesc">Debes registrar tu local o iniciar sesión para acceder al panel.</p>
+            <button type="button" class="btn-primary" id="accessModalBtn" onclick="redirigirCreacion()">Registrar mi local</button>
         </div>
     </div>
 
@@ -573,7 +572,7 @@
 
         applyTheme(currentMode);
 
-        function bloquearAcceso(titulo, mensaje, destinoUrl = 'login.html') {
+        function bloquearAcceso(titulo, mensaje, destinoUrl = 'crea.html') {
             document.getElementById('accessModalTitle').textContent = titulo;
             document.getElementById('accessModalDesc').textContent = mensaje;
             const btn = document.getElementById('accessModalBtn');
@@ -581,8 +580,8 @@
             document.getElementById('accessModal').classList.add('active');
         }
 
-        function redirigirLogin() {
-            window.location.href = 'login.html';
+        function redirigirCreacion() {
+            window.location.href = 'crea.html';
         }
 
         function getStorageTurnosKey() {
@@ -644,62 +643,83 @@
         async function cerrarSesionNegocio() {
             localStorage.removeItem('miturnopy_usuario_activo');
             await supabaseClient.auth.signOut();
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
+        }
+
+        function pintarDatosNegocio(datos) {
+            negocioActual = datos;
+            document.getElementById('negocioNombre').textContent = datos.nombre_local || datos.nombre || 'Mi Local';
+            const planLabel = (datos.plan || 'emprendedor').toUpperCase();
+            document.getElementById('negocioPlan').textContent = `Plan ${planLabel} • 15 Días Gratis`;
+            document.getElementById('negocioSubtitulo').textContent =
+                `Operador: ${datos.nombre_operador || 'Dueño'} • Correo: ${datos.correo || 'Registrado'}`;
+            document.getElementById('statDireccion').textContent = datos.direccion_local || 'Paraguay';
+
+            document.getElementById('dashboardContent').classList.add('visible');
+            cargarTurnos();
         }
 
         async function inicializarPanelNegocio() {
             try {
-                let correoBuscado = '';
                 const usuarioGuardado = JSON.parse(localStorage.getItem('miturnopy_usuario_activo') || 'null');
+                let correoBuscado = (usuarioGuardado?.correo || '').trim();
 
-                if (usuarioGuardado?.correo) {
-                    correoBuscado = usuarioGuardado.correo;
-                } else {
+                if (!correoBuscado) {
                     const { data: { session } } = await supabaseClient.auth.getSession();
                     if (session?.user?.email) {
-                        correoBuscado = session.user.email;
+                        correoBuscado = session.user.email.trim();
                     }
                 }
 
-                if (!correoBuscado) {
-                    bloquearAcceso(
-                        'Iniciá sesión para continuar',
-                        'No encontramos una sesión activa. Registrate como negocio o iniciá sesión con tu cuenta.',
-                        'register.html'
-                    );
+                // 1. Si hay correo, intentamos traer la fila actualizada desde Supabase
+                if (correoBuscado) {
+                    const { data: businessRow } = await supabaseClient
+                        .from('businesses')
+                        .select('*')
+                        .ilike('correo', correoBuscado)
+                        .order('id', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (businessRow) {
+                        pintarDatosNegocio(businessRow);
+                        return;
+                    }
+                }
+
+                // 2. Si viene recién registrado desde crea.html (usuarioGuardado.tipo === 'negocio'),
+                // cargamos sus datos sin bloquearlo aunque Supabase tenga RLS de lectura
+                if (usuarioGuardado && usuarioGuardado.tipo === 'negocio') {
+                    pintarDatosNegocio({
+                        nombre_local: usuarioGuardado.nombre || 'Mi Local',
+                        nombre_operador: usuarioGuardado.operador || 'Dueño',
+                        correo: usuarioGuardado.correo || '',
+                        direccion_local: usuarioGuardado.direccion || 'Paraguay',
+                        plan: usuarioGuardado.plan || 'emprendedor'
+                    });
                     return;
                 }
 
-                const { data: businessRow, error } = await supabaseClient
-                    .from('businesses')
-                    .select('*')
-                    .eq('correo', correoBuscado)
-                    .maybeSingle();
-
-                if (error || !businessRow) {
-                    bloquearAcceso(
-                        'Negocio no registrado',
-                        'Este correo no figura registrado en la tabla de negocios (businesses). Creá tu local primero para acceder al panel.',
-                        'crea.html'
-                    );
-                    return;
-                }
-
-                negocioActual = businessRow;
-                document.getElementById('negocioNombre').textContent = businessRow.nombre_local || 'Mi Local';
-                document.getElementById('negocioRubro').textContent = businessRow.rubro || 'Negocio / Profesional';
-                document.getElementById('negocioSubtitulo').textContent =
-                    `Operador: ${businessRow.nombre_operador || 'Dueño'} • Correo: ${businessRow.correo}`;
-
-                document.getElementById('dashboardContent').classList.add('visible');
-                cargarTurnos();
-            } catch (err) {
-                console.error('Error al cargar el panel del negocio:', err);
+                // 3. Si no hay sesión ni registro de negocio
                 bloquearAcceso(
-                    'Error de verificación',
-                    'No se pudo validar tu cuenta de negocio en este momento.',
-                    'login.html'
+                    'Creá tu local primero',
+                    'Todavía no registraste un negocio en esta sesión. Creá tu local en menos de 2 minutos para acceder a tu panel.',
+                    'crea.html'
                 );
+            } catch (err) {
+                console.error('Error al cargar el panel:', err);
+                const usuarioGuardado = JSON.parse(localStorage.getItem('miturnopy_usuario_activo') || 'null');
+                if (usuarioGuardado && usuarioGuardado.tipo === 'negocio') {
+                    pintarDatosNegocio({
+                        nombre_local: usuarioGuardado.nombre || 'Mi Local',
+                        nombre_operador: usuarioGuardado.operador || 'Dueño',
+                        correo: usuarioGuardado.correo || '',
+                        direccion_local: usuarioGuardado.direccion || 'Paraguay',
+                        plan: usuarioGuardado.plan || 'emprendedor'
+                    });
+                } else {
+                    bloquearAcceso('Acceso requerido', 'Iniciá sesión o creá tu local para entrar al panel.', 'crea.html');
+                }
             }
         }
 

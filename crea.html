@@ -1843,10 +1843,8 @@
                 return;
             }
 
-            // Recopilar todos los datos del formulario temporal y de los inputs
             const savedState = JSON.parse(localStorage.getItem('miturnopy_registro_state') || '{}');
             
-            // Recopilar horarios actuales
             const horariosObj = {};
             diasSemana.forEach(d => {
                 const chk = document.getElementById(`check_${d.id}`);
@@ -1859,14 +1857,16 @@
                 };
             });
 
-            const correoOperador = savedState.correo || document.getElementById('correo')?.value.trim() || '';
+            const nombreOperador = (savedState.nombreCompleto || document.getElementById('nombreCompleto')?.value || '').trim();
+            const correoOperador = (savedState.correo || document.getElementById('correo')?.value || '').trim();
+            const planElegido = document.querySelector('input[name="planSeleccionado"]:checked')?.value || 'emprendedor';
 
             const datosNegocio = {
-                nombre_operador: savedState.nombreCompleto || document.getElementById('nombreCompleto')?.value.trim() || '',
+                nombre_operador: nombreOperador,
                 correo: correoOperador,
-                telefono: (savedState.countryCode || '+595') + ' ' + (savedState.telefono || document.getElementById('telefono')?.value.trim() || ''),
-                cedula: savedState.cedula || document.getElementById('cedula')?.value.trim() || '',
-                plan: document.querySelector('input[name="planSeleccionado"]:checked')?.value || 'emprendedor',
+                telefono: (savedState.countryCode || '+595') + ' ' + (savedState.telefono || document.getElementById('telefono')?.value || '').trim(),
+                cedula: (savedState.cedula || document.getElementById('cedula')?.value || '').trim(),
+                plan: planElegido,
                 nombre_local: nombreLocal,
                 direccion_local: direccionLocal,
                 mapa_url: document.getElementById('mapaUrl').value.trim(),
@@ -1879,7 +1879,6 @@
                 banner_url: document.getElementById('bannerImgTag').src.startsWith('data:image') ? document.getElementById('bannerImgTag').src : ''
             };
 
-            // Enviar a Supabase
             const { data, error } = await supabaseClient
                 .from('businesses')
                 .insert([datosNegocio]);
@@ -1889,14 +1888,16 @@
                 return;
             }
 
-            // Guardar sesión activa del negocio para que el panel lo cargue directo
+            // Guardar sesión activa completa del negocio para acceder directo al panel
             localStorage.setItem('miturnopy_usuario_activo', JSON.stringify({
                 tipo: 'negocio',
                 nombre: nombreLocal,
-                correo: correoOperador
+                operador: nombreOperador,
+                correo: correoOperador,
+                direccion: direccionLocal,
+                plan: planElegido
             }));
 
-            // Limpiar datos temporales solo al completar con éxito
             localStorage.removeItem('miturnopy_registro_state');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('successModal').classList.add('active');

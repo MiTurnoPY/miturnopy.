@@ -721,7 +721,7 @@
             text-decoration: underline;
         }
 
-        /* ADAPTABILIDAD RESPONSIVE PARA CELULARES Y TABLETS (Sin tocar el diseño de notebook) */
+        /* ADAPTABILIDAD RESPONSIVE PARA CELULARES Y TABLETS */
         @media (max-width: 1024px) {
             header {
                 padding: 15px 20px;
@@ -756,7 +756,7 @@
 
         @media (max-width: 768px) {
             header nav ul {
-                display: none; /* Ocultar menú superior en móviles para evitar saturación, o apilarlo */
+                display: none;
             }
             .hero-radical-content h1 {
                 font-size: 2.2rem;
@@ -769,7 +769,7 @@
                 gap: 10px;
             }
             .hero-card {
-                transform: none; /* Quitar efecto 3D rotado en celulares para lectura limpia */
+                transform: none;
             }
             .footer-links-group {
                 gap: 20px;
@@ -817,7 +817,7 @@
                 <span id="themeText">Oscuro</span>
             </button>
             <a href="login.html" class="btn-login">Iniciá sesión</a>
-            <a href="crea.html" class="btn-create">Crear YA</a>
+            <a href="crea.html" class="btn-create" id="headerCtaBtn">Crear YA</a>
         </div>
     </header>
 
@@ -828,7 +828,7 @@
                 <h1>Tu salón al siguiente nivel, <span>agenda inteligente</span></h1>
                 <p>La plataforma definitiva en Paraguay para potenciar tu salón, estética o barbería con reservas en línea automáticas y cero fricción operativa.</p>
                 <div class="hero-action-set">
-                    <a href="crea.html" class="btn-radical-main">Empezá gratis hoy</a>
+                    <a href="crea.html" class="btn-radical-main" id="heroCtaBtn">Empezá gratis hoy</a>
                     <a href="conoce-mas.html" class="btn-radical-sub">Conocé más</a>
                 </div>
                 <div>
@@ -981,7 +981,7 @@
         </div>
     </footer>
 
-    <!-- Sincronización de temas y transiciones -->
+    <!-- Sincronización de temas, sesión de negocio y transiciones -->
     <script>
         const body = document.body;
         const iconContainer = document.getElementById('themeIconContainer');
@@ -1020,6 +1020,24 @@
         }
 
         applyTheme(currentMode);
+
+        // Cambiar botones de crear local a "Ir al panel" si ya tiene negocio registrado
+        document.addEventListener('DOMContentLoaded', () => {
+            const usuarioActivo = JSON.parse(localStorage.getItem('miturnopy_usuario_activo') || 'null');
+            if (usuarioActivo && usuarioActivo.tipo === 'negocio') {
+                const headerBtn = document.getElementById('headerCtaBtn');
+                const heroBtn = document.getElementById('heroCtaBtn');
+
+                if (headerBtn) {
+                    headerBtn.textContent = 'Ir al panel';
+                    headerBtn.href = 'panel-negocio.html';
+                }
+                if (heroBtn) {
+                    heroBtn.textContent = 'Ir al panel';
+                    heroBtn.href = 'panel-negocio.html';
+                }
+            }
+        });
     </script>
 </body>
 </html>
