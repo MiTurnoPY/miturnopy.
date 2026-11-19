@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Negocio - MiTurnoPY</title>
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #b8004f;
+            --primary-hover: #96003f;
+            --bg-color: #f7f9fc;
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --nav-bg: #b8004f;
+            --nav-text: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+            --glow-color: rgba(184, 0, 79, 0.15);
+            --badge-bg: #fff1f2;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0b0106;
+            --text-color: #ffffff;
+            --text-muted: #b0b0b0;
+            --nav-bg: #1f0510;
+            --nav-text: #ffffff;
+            --card-bg: #15030c;
+            --card-border: #380d22;
+            --glow-color: rgba(184, 0, 79, 0.3);
+            --badge-bg: #2b0617;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 80px;
+            position: relative;
+            overflow-x: hidden;
+            animation: fadeInPage 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 760px;
+            height: 420px;
+            background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--nav-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            height: 48px;
+            width: 48px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .logo-text {
+            color: var(--nav-text);
+            font-size: 1.55rem;
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .theme-toggle:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-nav {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #ffffff;
+        }
+
+        .dashboard-wrapper {
+            flex: 1;
+            max-width: 1120px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 20px 48px 20px;
+            position: relative;
+            z-index: 1;
+            display: none;
+        }
+
+        .dashboard-wrapper.visible {
+            display: block;
+            animation: fadeInUp 0.45s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 22px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 14px 32px rgba(0,0,0,0.08);
+        }
+
+        .badge-rubro {
+            display: inline-block;
+            background: var(--badge-bg);
+            color: var(--primary-color);
+            border: 1px solid rgba(184, 0, 79, 0.25);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .panel-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .panel-header p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 22px;
+        }
+
+        @media (max-width: 860px) {
+            .panel-grid {
+                grid-template-columns: 1fr;
+            }
+            header {
+                padding: 14px 20px;
+            }
+        }
+
+        .box-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 22px;
+            padding: 26px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.07);
+        }
+
+        .box-card h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.84rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 10px;
+            border: 2px solid var(--card-border);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.92rem;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(184, 0, 79, 0.28);
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .turnos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .turno-item {
+            background: var(--bg-color);
+            border: 1.5px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .turno-meta strong {
+            display: block;
+            font-size: 0.98rem;
+            margin-bottom: 3px;
+        }
+
+        .turno-meta span {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: 1.5px solid #ef4444;
+            color: #ef4444;
+            padding: 6px 12px;
+            border-radius: 9px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 28px 14px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Modal Estilo MiTurnoPY */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 24px;
+            padding: 36px 42px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 28px 56px rgba(0,0,0,0.45);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(135deg, #b8004f 0%, #ff4b91 100%);
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .modal-desc {
+            font-size: 0.94rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+
+        footer {
+            background-color: var(--nav-bg);
+            color: #ffffff;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 18px 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="logo.png" alt="MiTurnoPY Logo" onerror="this.style.display='none'">
+            <span class="logo-text">MiTurnoPY</span>
+        </a>
+        <div class="nav-buttons">
+            <button class="theme-toggle" id="themeToggleBtn" onclick="cycleTheme()" title="Cambiar modo">
+                <span id="themeIconContainer"></span>
+                <span id="themeText">Claro</span>
+            </button>
+            <a href="index.html" class="btn-nav">Inicio</a>
+            <button type="button" class="btn-nav" onclick="cerrarSesionNegocio()">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="dashboard-wrapper" id="dashboardContent">
+        <section class="panel-header">
+            <div>
+                <span class="badge-rubro" id="negocioRubro">Negocio Registrado</span>
+                <h1 id="negocioNombre">Cargando local...</h1>
+                <p id="negocioSubtitulo">Operador: — • Correo: —</p>
+            </div>
+            <div>
+                <a href="crea.html" class="btn-nav" style="color: var(--primary-color); border-color: var(--primary-color);">
+                    Editar datos del local
+                </a>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Turnos agendados hoy</div>
+                <div class="stat-value" id="statTotalTurnos">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Estado del local</div>
+                <div class="stat-value" style="font-size: 1.25rem;">Activo</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Plataforma</div>
+                <div class="stat-value" style="font-size: 1.25rem;">MiTurnoPY</div>
+            </div>
+        </section>
+
+        <section class="panel-grid">
+            <div class="box-card">
+                <h2>Agendar nuevo turno</h2>
+                <form onsubmit="agregarTurno(event)" novalidate>
+                    <div class="form-group">
+                        <label for="turnoCliente">Nombre del cliente</label>
+                        <input type="text" id="turnoCliente" placeholder="Ej: Carlos López">
+                    </div>
+                    <div class="form-group">
+                        <label for="turnoServicio">Servicio</label>
+                        <input type="text" id="turnoServicio" placeholder="Ej: Corte y barba / Uñas / Peinado">
+                    </div>
+                    <div class="form-group">
+                        <label for="turnoHora">Horario</label>
+                        <input type="time" id="turnoHora">
+                    </div>
+                    <button type="submit" class="btn-primary">Guardar turno en agenda</button>
+                </form>
+            </div>
+
+            <div class="box-card">
+                <h2>Agenda del local</h2>
+                <div class="turnos-list" id="listaTurnos">
+                    <div class="empty-state">Todavía no hay turnos cargados en este local.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Bloqueo / Aviso -->
+    <div class="modal-overlay" id="accessModal">
+        <div class="modal-card">
+            <h3 class="modal-title" id="accessModalTitle">Acceso restringido</h3>
+            <p class="modal-desc" id="accessModalDesc">Debes iniciar sesión con una cuenta de negocio registrada para acceder a este panel.</p>
+            <button type="button" class="btn-primary" id="accessModalBtn" onclick="redirigirLogin()">Ir a iniciar sesión</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 MiTurnoPY • Operado por José Jacquet • Paraguay</p>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://astunocktydyecguufqw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Wbc3Zw3xqFC-8Pgu1ZnRmQ_Z9mXQXxz';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const body = document.body;
+        const iconContainer = document.getElementById('themeIconContainer');
+        const textSpan = document.getElementById('themeText');
+        let currentMode = localStorage.getItem('miturnopy_theme') || 'light';
+        let negocioActual = null;
+
+        const svgs = {
+            light: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+            dark: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            system: '<svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+        };
+
+        function applyTheme(mode) {
+            currentMode = mode;
+            localStorage.setItem('miturnopy_theme', mode);
+            if (mode === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                if (iconContainer) iconContainer.innerHTML = svgs.system;
+                if (textSpan) textSpan.textContent = 'Sistema';
+            } else if (mode === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                if (iconContainer) iconContainer.innerHTML = svgs.dark;
+                if (textSpan) textSpan.textContent = 'Oscuro';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                if (iconContainer) iconContainer.innerHTML = svgs.light;
+                if (textSpan) textSpan.textContent = 'Claro';
+            }
+        }
+
+        function cycleTheme() {
+            if (currentMode === 'light') applyTheme('dark');
+            else if (currentMode === 'dark') applyTheme('system');
+            else applyTheme('light');
+        }
+
+        applyTheme(currentMode);
+
+        function bloquearAcceso(titulo, mensaje, destinoUrl = 'login.html') {
+            document.getElementById('accessModalTitle').textContent = titulo;
+            document.getElementById('accessModalDesc').textContent = mensaje;
+            const btn = document.getElementById('accessModalBtn');
+            btn.onclick = () => { window.location.href = destinoUrl; };
+            document.getElementById('accessModal').classList.add('active');
+        }
+
+        function redirigirLogin() {
+            window.location.href = 'login.html';
+        }
+
+        function getStorageTurnosKey() {
+            const identificador = negocioActual?.correo || negocioActual?.nombre_local || 'local';
+            return `miturnopy_turnos_${identificador}`;
+        }
+
+        function cargarTurnos() {
+            const lista = document.getElementById('listaTurnos');
+            const totalEl = document.getElementById('statTotalTurnos');
+            const turnos = JSON.parse(localStorage.getItem(getStorageTurnosKey()) || '[]');
+
+            totalEl.textContent = turnos.length;
+
+            if (!turnos.length) {
+                lista.innerHTML = '<div class="empty-state">Todavía no hay turnos cargados en este local.</div>';
+                return;
+            }
+
+            lista.innerHTML = turnos.map((t, index) => `
+                <div class="turno-item">
+                    <div class="turno-meta">
+                        <strong>${t.cliente}</strong>
+                        <span>${t.servicio} • ${t.hora} hs</span>
+                    </div>
+                    <button type="button" class="btn-delete" onclick="eliminarTurno(${index})">Eliminar</button>
+                </div>
+            `).join('');
+        }
+
+        function agregarTurno(e) {
+            e.preventDefault();
+            const cliente = document.getElementById('turnoCliente').value.trim();
+            const servicio = document.getElementById('turnoServicio').value.trim();
+            const hora = document.getElementById('turnoHora').value;
+
+            if (!cliente || !servicio || !hora) {
+                alert('Completá el nombre del cliente, el servicio y el horario.');
+                return;
+            }
+
+            const turnos = JSON.parse(localStorage.getItem(getStorageTurnosKey()) || '[]');
+            turnos.push({ cliente, servicio, hora });
+            localStorage.setItem(getStorageTurnosKey(), JSON.stringify(turnos));
+
+            document.getElementById('turnoCliente').value = '';
+            document.getElementById('turnoServicio').value = '';
+            document.getElementById('turnoHora').value = '';
+            cargarTurnos();
+        }
+
+        function eliminarTurno(index) {
+            const turnos = JSON.parse(localStorage.getItem(getStorageTurnosKey()) || '[]');
+            turnos.splice(index, 1);
+            localStorage.setItem(getStorageTurnosKey(), JSON.stringify(turnos));
+            cargarTurnos();
+        }
+
+        async function cerrarSesionNegocio() {
+            localStorage.removeItem('miturnopy_usuario_activo');
+            await supabaseClient.auth.signOut();
+            window.location.href = 'login.html';
+        }
+
+        async function inicializarPanelNegocio() {
+            try {
+                let correoBuscado = '';
+                const usuarioGuardado = JSON.parse(localStorage.getItem('miturnopy_usuario_activo') || 'null');
+
+                if (usuarioGuardado?.correo) {
+                    correoBuscado = usuarioGuardado.correo;
+                } else {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session?.user?.email) {
+                        correoBuscado = session.user.email;
+                    }
+                }
+
+                if (!correoBuscado) {
+                    bloquearAcceso(
+                        'Iniciá sesión para continuar',
+                        'No encontramos una sesión activa. Registrate como negocio o iniciá sesión con tu cuenta.',
+                        'register.html'
+                    );
+                    return;
+                }
+
+                const { data: businessRow, error } = await supabaseClient
+                    .from('businesses')
+                    .select('*')
+                    .eq('correo', correoBuscado)
+                    .maybeSingle();
+
+                if (error || !businessRow) {
+                    bloquearAcceso(
+                        'Negocio no registrado',
+                        'Este correo no figura registrado en la tabla de negocios (businesses). Creá tu local primero para acceder al panel.',
+                        'crea.html'
+                    );
+                    return;
+                }
+
+                negocioActual = businessRow;
+                document.getElementById('negocioNombre').textContent = businessRow.nombre_local || 'Mi Local';
+                document.getElementById('negocioRubro').textContent = businessRow.rubro || 'Negocio / Profesional';
+                document.getElementById('negocioSubtitulo').textContent =
+                    `Operador: ${businessRow.nombre_operador || 'Dueño'} • Correo: ${businessRow.correo}`;
+
+                document.getElementById('dashboardContent').classList.add('visible');
+                cargarTurnos();
+            } catch (err) {
+                console.error('Error al cargar el panel del negocio:', err);
+                bloquearAcceso(
+                    'Error de verificación',
+                    'No se pudo validar tu cuenta de negocio en este momento.',
+                    'login.html'
+                );
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', inicializarPanelNegocio);
+    </script>
+</body>
+</html>
